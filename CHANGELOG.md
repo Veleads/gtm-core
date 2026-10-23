@@ -4,6 +4,8 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+
+## [0.1.1] - 2026-10-23
 - **no action** Client repo CI templates (`gtm.yml`, `gtm-upgrade.yml`) use actions/checkout@v7,
   actions/setup-node@v7, pnpm/action-setup@v6 and peter-evans/create-pull-request@v8 (Node 24 runtimes).
   Applies to repos created with `gtm init` from this version on; existing client repos can copy the
