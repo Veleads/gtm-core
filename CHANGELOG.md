@@ -4,6 +4,8 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+
+## [0.2.1] - 2026-10-24
 - **no action** The npm package now has a README (what it is, quick start, commands, guidance for
   coding agents).
 - **no action** `gtm <command> --help` and `gtm help <command>` print that command's usage, what it
