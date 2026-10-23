@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { parse } from "yaml";
 import type { z } from "zod";
 import {
-  CampaignConfig, ClientFile, FEATURES, FILE_VERSIONS, IcpFile, SignalsFile, Stage, type FileKind,
+  CampaignConfig, ClientFile, FEATURES, FILE_VERSIONS, IcpFile, SignalsFile, Stage, icpContentHash, type FileKind,
 } from "@gtm/schemas";
 import { Report, subdirs, walk } from "../fsutil.ts";
 import { GTM_VERSION, KIT_DIR, PACKAGE_NAME } from "../paths.ts";
@@ -70,7 +70,24 @@ function checkNoLeadData(r: Report, root: string) {
   }
 }
 
-function validateCampaign(r: Report, root: string, clientId: string, campaign: string, icp: IcpFile | null, signals: SignalsFile | null) {
+/**
+ * The ICP gate holds only while icp.yaml is unchanged since approval. Approvals recorded before
+ * hashes existed (no content_hash) still count, with a warning to pin them.
+ */
+function checkIcpApproval(r: Report, file: string, icp: IcpFile): boolean {
+  if (icp.approval.status !== "approved") return false;
+  const pinned = icp.approval.content_hash;
+  if (!pinned) {
+    r.warn(file, `approved without a content hash: pin it with \`pnpm gtm approve icp --by "${icp.approval.approved_by}" --date ${icp.approval.approved_at}\``);
+    return true;
+  }
+  const current = icpContentHash(parse(readFileSync(file, "utf8")));
+  if (current === pinned) return true;
+  r.err(file, `changed after approval (approved ${pinned}, now ${current}). Re-present the ICP to the client approver and record it with \`pnpm gtm approve icp --by "<name>"\`, or revert the change`);
+  return false;
+}
+
+function validateCampaign(r: Report, root: string, clientId: string, campaign: string, icp: IcpFile | null, signals: SignalsFile | null, icpApproved: boolean) {
   const dir = join(root, "campaigns", campaign);
   console.log(`campaign ${campaign}`);
   for (const f of REQUIRED_CAMPAIGN) if (!existsSync(join(dir, f))) r.err(join(dir, f), "missing");
@@ -101,8 +118,8 @@ function validateCampaign(r: Report, root: string, clientId: string, campaign: s
     }
 
     // Gates: a campaign cannot be past a gate that a human has not approved.
-    if (stageIndex(cfg.stage) > stageIndex("icp") && icp?.approval.status !== "approved") {
-      r.err(cfgFile, `stage is "${cfg.stage}" but the ICP gate (context/icp.yaml approval) is not approved`);
+    if (stageIndex(cfg.stage) > stageIndex("icp") && !icpApproved) {
+      r.err(cfgFile, `stage is "${cfg.stage}" but the ICP gate (context/icp.yaml approval) is not approved, or the ICP changed since approval`);
     }
     if (stageIndex(cfg.stage) > stageIndex("copy") && cfg.gates.copy.status !== "approved") {
       r.err(cfgFile, `stage is "${cfg.stage}" but gates.copy is not approved`);
@@ -147,13 +164,14 @@ export function runValidate(root: string, onlyCampaign?: string): boolean {
   const signals = existsSync(sigFile) ? loadVersioned(r, sigFile, "signals", SignalsFile) : null;
   if (meta && icp && icp.client_id !== clientId) r.err(icpFile, `client_id "${icp.client_id}" does not match client.yaml "${clientId}"`);
   if (meta && signals && signals.client_id !== clientId) r.err(sigFile, `client_id "${signals.client_id}" does not match client.yaml "${clientId}"`);
+  const icpApproved = icp ? checkIcpApproval(r, icpFile, icp) : false;
 
   checkNoLeadData(r, root);
 
   const campaigns = onlyCampaign ? [onlyCampaign] : subdirs(join(root, "campaigns"));
   for (const c of campaigns) {
     if (!existsSync(join(root, "campaigns", c))) { r.err(join(root, "campaigns", c), "campaign folder not found"); continue; }
-    validateCampaign(r, root, clientId, c, icp, signals);
+    validateCampaign(r, root, clientId, c, icp, signals, icpApproved);
   }
 
   r.summary();

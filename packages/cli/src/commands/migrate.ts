@@ -2,7 +2,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { parseDocument } from "yaml";
-import { migrateDocument, type FileKind } from "@gtm/schemas";
+import { icpContentHash, migrateDocument, type FileKind } from "@gtm/schemas";
 import { subdirs } from "../fsutil.ts";
 
 export function clientYamlFiles(root: string): { kind: FileKind; file: string }[] {
@@ -23,10 +23,17 @@ export function runMigrate(root: string, opts: { dryRun?: boolean } = {}): boole
     const doc = parseDocument(readFileSync(file, "utf8"));
     if (doc.errors.length) { console.log(`  ✗ ${rel}: invalid YAML: ${doc.errors[0]!.message}`); ok = false; continue; }
     try {
+      // An approved ICP whose hash matches stays approved: the core migration changes shape, not substance.
+      const before = doc.toJS() as Record<string, any>;
+      const pinned = kind === "icp" && before.approval?.status === "approved" && before.approval?.content_hash === icpContentHash(before);
       const res = migrateDocument(kind, doc);
       if (res.applied.length === 0) continue;
       changed++;
       for (const a of res.applied) console.log(`  ${opts.dryRun ? "would apply" : "applied"} ${rel}: ${a}`);
+      if (pinned) {
+        doc.setIn(["approval", "content_hash"], icpContentHash(doc.toJS() as Record<string, unknown>));
+        console.log(`  re-pinned ICP approval hash in ${rel} (core migration, content approved by the client)`);
+      }
       // Keep client formatting close to hand-written: no padding inside [ ], no line wrapping.
       if (!opts.dryRun) writeFileSync(file, doc.toString({ flowCollectionPadding: false, lineWidth: 0 }));
     } catch (e) {

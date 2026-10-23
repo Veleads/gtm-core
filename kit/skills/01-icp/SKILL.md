@@ -30,8 +30,9 @@ Define who we target and why, in a form both humans (icp.md) and code (icp.yaml,
    available). This sets up the stage-2 sanity check.
 8. `pnpm gtm validate` must pass.
 9. **HARD STOP.** Present to the human for client sign-off: segments + filters, personas, exclusions,
-   signals with weights, expected TAM range. Follow AGENTS.md section 4 to record approval in
-   `icp.yaml` → `approval`.
+   signals with weights, expected TAM range. Only after explicit approval from the named approver,
+   record it: `pnpm gtm approve icp --by "<Name (client)>" --notes "<what was approved>"`. Quote the
+   approval in the run log and commit both together.
 
 ## Outputs
 `context/icp.md`, `icp.yaml`, `signals.yaml`, `personas.md`, `offer.md`, `proof.md`, `voice.md`.
@@ -43,11 +44,13 @@ Define who we target and why, in a form both humans (icp.md) and code (icp.yaml,
 - [ ] Signal weights sum to something sensible relative to campaign tier thresholds
 - [ ] Competitors and excluded industries listed
 - [ ] icp.md and icp.yaml agree
+- [ ] Approval recorded with `gtm approve icp`, not by hand
 
 ## Gate
-**Client ICP sign-off (hard stop).** `icp.yaml` → `approval.status: approved` with name and date,
-only after explicit human approval in session. Any later change to segments, personas or exclusions
-resets it to `pending`.
+**Client ICP sign-off (hard stop).** Recorded with `pnpm gtm approve icp`, which pins a hash of the
+approved content. Any later change to segments, personas, exclusions or other ICP content makes
+`pnpm gtm validate` fail until the ICP is re-presented and approved again (or the change is reverted).
+Comments and formatting do not count as changes.
 
 ## Next
 Create a campaign (`pnpm gtm new-campaign <slug>`) and go to `.gtm/skills/02-tam/SKILL.md`.

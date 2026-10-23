@@ -4,6 +4,11 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+- **action** ICP approvals are now pinned to the approved content. New `gtm approve icp --by "<name>"`
+  records the sign-off with a `content_hash`; `gtm validate` fails if `context/icp.yaml` changes after
+  approval (comments/formatting excepted) and blocks campaigns past `icp` until it is re-approved.
+  Existing approvals without a hash keep working with a warning; pin them once with
+  `pnpm gtm approve icp --by "<approver>" --date <original approval date>`.
 
 ## [0.1.1] - 2026-10-23
 - **no action** Client repo CI templates (`gtm.yml`, `gtm-upgrade.yml`) use actions/checkout@v7,

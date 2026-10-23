@@ -10,3 +10,4 @@ export * from "./lead.ts";
 export * from "./versions.ts";
 export * from "./features.ts";
 export * from "./migrations.ts";
+export * from "./approval-hash.ts";

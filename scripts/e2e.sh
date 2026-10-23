@@ -33,6 +33,12 @@ echo "• fixture content validates in a real client repo"
 cp -R "$ROOT/examples/northwind/." .
 $PNPM exec gtm validate
 
+echo "• editing an approved ICP is caught, and re-approval clears it"
+perl -pi -e 's/max: 1500/max: 2000/' context/icp.yaml
+if $PNPM exec gtm validate >/dev/null; then echo "expected validate to fail after ICP change"; exit 1; fi
+$PNPM exec gtm approve icp --by "E2E Approver (client)" >/dev/null
+$PNPM exec gtm validate | tail -1
+
 echo "• hand-edited core file is caught"
 echo "tampered" >> .gtm/skills/05-copy/SKILL.md
 if $PNPM exec gtm sync --check >/dev/null; then echo "expected sync --check to fail"; exit 1; fi

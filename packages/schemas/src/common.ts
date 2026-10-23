@@ -39,6 +39,11 @@ export const Approval = z
     approved_by: z.string().min(1).nullable(),
     approved_at: IsoDate.nullable(),
     notes: z.string().optional(),
+    content_hash: z
+      .string()
+      .regex(/^sha256:[0-9a-f]{16}$/)
+      .optional()
+      .describe("Fingerprint of the approved content, written by `gtm approve`. Never edit by hand."),
   })
   .refine(
     (a) => a.status !== "approved" || (a.approved_by !== null && a.approved_at !== null),
