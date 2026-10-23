@@ -1,7 +1,7 @@
 # gtm-client-__CLIENT_ID__ · __CLIENT_NAME__
 
 Private client repo. Runs the standard gtm-brain process from the public core package
-[`@velead/gtm`](https://www.npmjs.com/package/@velead/gtm), pinned in
+[`@veleads/gtm`](https://www.npmjs.com/package/@veleads/gtm), pinned in
 `package.json`. **Start with AGENTS.md** (generated from core; do not edit) and then CLIENT.md.
 
 ## Setup
@@ -15,7 +15,7 @@ pnpm gtm validate
 ## What lives where
 | Path | Owner | Edit? |
 |---|---|---|
-| `AGENTS.md`, `.gtm/` | core (`gtm sync`) | never: changes go to velead/gtm-core |
+| `AGENTS.md`, `.gtm/` | core (`gtm sync`) | never: changes go to Veleads/gtm-core |
 | `CLIENT.md` | this client | yes: client-specific additions only |
 | `client.yaml`, `context/`, `tam/`, `campaigns/` | this client | yes: through the stage playbooks |
 

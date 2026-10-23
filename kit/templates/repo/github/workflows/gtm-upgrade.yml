@@ -1,5 +1,5 @@
 name: gtm-upgrade
-# Opens a PR when a newer @velead/gtm is published. Requires repo setting:
+# Opens a PR when a newer @veleads/gtm is published. Requires repo setting:
 # Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests".
 on:
   schedule:
@@ -22,9 +22,9 @@ jobs:
       - name: Upgrade core (sync + migrate + validate)
         id: upgrade
         run: |
-          before=$(node -p "require('./package.json').devDependencies['@velead/gtm']")
+          before=$(node -p "require('./package.json').devDependencies['@veleads/gtm']")
           pnpm exec gtm upgrade 2>&1 | tee upgrade.log || true
-          after=$(node -p "require('./package.json').devDependencies['@velead/gtm']")
+          after=$(node -p "require('./package.json').devDependencies['@veleads/gtm']")
           echo "before=$before" >> "$GITHUB_OUTPUT"
           echo "after=$after" >> "$GITHUB_OUTPUT"
       - name: Open PR

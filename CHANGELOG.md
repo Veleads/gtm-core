@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `@velead/gtm`. Each entry is tagged: **no action**, **opt-in**, **action**, or
+All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **opt-in**, **action**, or
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]

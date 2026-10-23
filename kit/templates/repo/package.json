@@ -8,6 +8,6 @@
     "check": "gtm sync --check && gtm validate"
   },
   "devDependencies": {
-    "@velead/gtm": "__GTM_VERSION__"
+    "@veleads/gtm": "__GTM_VERSION__"
   }
 }

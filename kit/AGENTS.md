@@ -1,7 +1,7 @@
 # AGENTS.md: gtm-brain operating manual (core v{{GTM_VERSION}})
 
 This repo is **one client's** private gtm-brain repo. It runs the agency's standard outbound process,
-which comes from the core package `@velead/gtm` (pinned in `package.json`). This file is written for
+which comes from the core package `@veleads/gtm` (pinned in `package.json`). This file is written for
 any coding agent (Claude Code, Codex, others) and for the humans driving them. Everything you need is
 a plain file in this repo. Do not rely on agent-specific plugins, connectors, MCP servers or globally
 installed skills; if a step needs a capability, it is a `pnpm gtm …` command.
@@ -14,7 +14,7 @@ Read order: **this file → `CLIENT.md` (client-specific additions) → the stag
 
 | Path | Owner | Edit here? |
 |---|---|---|
-| `AGENTS.md`, `.gtm/` (skills, templates, schemas, provider docs) | core, copied by `gtm sync` | **Never.** CI fails if they differ from the pinned core. Improvements go to the velead/gtm-core repo. |
+| `AGENTS.md`, `.gtm/` (skills, templates, schemas, provider docs) | core, copied by `gtm sync` | **Never.** CI fails if they differ from the pinned core. Improvements go to the Veleads/gtm-core repo. |
 | `CLIENT.md` | this client | Yes. Client-specific rules that **add** to stages; they never remove steps or weaken hard stops. |
 | `client.yaml` | this client | Yes. Owners, approver, regions, opt-in `features`. |
 | `context/` | this client | Yes. intake, ICP (md + yaml), signals, personas, offer, proof, voice. |
@@ -133,7 +133,7 @@ Rules, no exceptions:
   `campaigns/<campaign>/runs/<YYYY-MM-DD>-<user>.md` (`-2`, `-3` for more runs the same day). Never
   edit someone else's run log; never rewrite a past one. `<user>` is `GTM_USER` from `.env`.
 - **Learnings become core PRs, not local edits.** A better step, a missing check or a provider quirk:
-  write it under "Learnings → PRs" in the run log; a GTM engineer turns it into a PR on velead/gtm-core.
+  write it under "Learnings → PRs" in the run log; a GTM engineer turns it into a PR on Veleads/gtm-core.
   A rule that only applies to this client goes into `CLIENT.md` instead.
 - Two people on the same campaign: coordinate via the run log "Next step"; one person triggers jobs at
   a time. Jobs are idempotent, but costs are real.
@@ -175,7 +175,7 @@ Every job prints a `run_id`, counts and cost. Copy those into the run log.
 
 ## 9. Onboarding
 
-- **New client:** a GTM engineer runs `npx @velead/gtm init <slug> --name "<Name>"`, pushes it as a
+- **New client:** a GTM engineer runs `npx @veleads/gtm init <slug> --name "<Name>"`, pushes it as a
   **private** repo (e.g. `<org>/gtm-client-<slug>`), then stage `00-intake` begins.
 - **New campaign:** from up-to-date `main`: `git switch -c campaign/<slug>`,
   `pnpm gtm new-campaign <slug>`, fill `brief.md`, set `stage`, follow the routing table.

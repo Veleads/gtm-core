@@ -1,6 +1,6 @@
 name: release
-# Publishes @velead/gtm to npm with Trusted Publishing (OIDC): no npm token is stored anywhere.
-# npmjs.com → @velead/gtm → Settings → Trusted Publisher: GitHub Actions, org "velead",
+# Publishes @veleads/gtm to npm with Trusted Publishing (OIDC): no npm token is stored anywhere.
+# npmjs.com → @veleads/gtm → Settings → Trusted Publisher: GitHub Actions, org "Veleads",
 # repo "gtm-core", workflow "release.yml", environment "npm".
 on:
   push:
@@ -40,4 +40,4 @@ jobs:
       - name: Pack
         run: cd packages/cli && pnpm pack --pack-destination "$RUNNER_TEMP"
       - name: Publish (OIDC, provenance generated automatically)
-        run: npm publish "$RUNNER_TEMP"/velead-gtm-*.tgz --access public
+        run: npm publish "$RUNNER_TEMP"/veleads-gtm-*.tgz --access public

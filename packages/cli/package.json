@@ -1,5 +1,5 @@
 {
-  "name": "@velead/gtm",
+  "name": "@veleads/gtm",
   "version": "0.1.0",
   "description": "gtm-brain core: process kit (AGENTS.md, skills, templates, schemas) and the gtm CLI for client repos",
   "keywords": [
@@ -16,7 +16,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/velead/gtm-core.git"
+    "url": "git+https://github.com/Veleads/gtm-core.git"
   },
   "publishConfig": {
     "access": "public"
@@ -44,8 +44,8 @@
     "@gtm/schemas": "workspace:*",
     "tsup": "^8.5.0"
   },
-  "homepage": "https://github.com/velead/gtm-core#readme",
+  "homepage": "https://github.com/Veleads/gtm-core#readme",
   "bugs": {
-    "url": "https://github.com/velead/gtm-core/issues"
+    "url": "https://github.com/Veleads/gtm-core/issues"
   }
 }

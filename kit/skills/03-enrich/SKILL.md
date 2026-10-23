@@ -37,7 +37,7 @@ Turn active accounts into contacts with verified emails at the lowest cost, with
 ## Checklist
 - [ ] Pilot run before full run, results recorded
 - [ ] Spend so far vs. cap recorded
-- [ ] Per-provider hit rate and cost per verified email recorded (feeds `providers/` docs via a PR to velead/gtm-core)
+- [ ] Per-provider hit rate and cost per verified email recorded (feeds `providers/` docs via a PR to Veleads/gtm-core)
 - [ ] Re-run of the same job showed ~zero new cost (cache works)
 - [ ] No lead data written to git
 

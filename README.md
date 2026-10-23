@@ -1,7 +1,7 @@
 # gtm-core
 
 **An agent-agnostic, git-versioned operating system for running outbound across many clients with
-one standard process.** Built and used by [Velead](https://github.com/velead). Works with Claude Code,
+one standard process.** Built and used by [Veleads](https://github.com/Veleads). Works with Claude Code,
 Codex, or any coding agent that can read files and run shell commands.
 
 > Status: early. The process kit, schemas, validator and upgrade tooling work today. Execution jobs
@@ -10,7 +10,7 @@ Codex, or any coding agent that can read files and run shell commands.
 ## The idea
 
 - **One core, many clients.** The process (stage playbooks, rules, schemas, templates, CLI) lives here
-  and is published as [`@velead/gtm`](https://www.npmjs.com/package/@velead/gtm). Each client gets its
+  and is published as [`@veleads/gtm`](https://www.npmjs.com/package/@veleads/gtm). Each client gets its
   own **private** repo that pins a core version and holds only that client's context and campaigns.
 - **Improvements reach every client without breaking them.** New core versions arrive in client repos
   as a reviewable PR: kit re-synced, client YAML migrated automatically, validation run, changelog shown.
@@ -21,7 +21,7 @@ Codex, or any coding agent that can read files and run shell commands.
 - **No lead data in git.** Repos hold context, configs and aggregate run logs; leads live in Postgres.
 
 ```
-gtm-core (this repo, public) ──release──► @velead/gtm on npm
+gtm-core (this repo, public) ──release──► @veleads/gtm on npm
    kit/ + CLI + schemas                         │ pinned + synced into .gtm/
    workers/ + db/ ──deploy──► Hatchet + Postgres (shared execution)
                                                 ▼
@@ -35,7 +35,7 @@ Read the operator manual agents follow in client repos: [kit/AGENTS.md](kit/AGEN
 ## Start a client repo
 
 ```bash
-npx @velead/gtm init acme --name "Acme Corp"
+npx @veleads/gtm init acme --name "Acme Corp"
 cd gtm-client-acme && pnpm install
 pnpm gtm status
 pnpm gtm validate

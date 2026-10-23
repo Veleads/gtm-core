@@ -13,7 +13,7 @@ Collect everything later stages need, once, in files, so no one has to re-ask th
 - `context/intake.md` (scaffolded from the core template by `gtm init`).
 
 ## Steps
-1. If the client repo does not exist yet, a GTM engineer creates it: `npx @velead/gtm init <slug> --name "<Name>"`, then pushes it as a **private** repo (e.g. `<org>/gtm-client-<slug>`).
+1. If the client repo does not exist yet, a GTM engineer creates it: `npx @veleads/gtm init <slug> --name "<Name>"`, then pushes it as a **private** repo (e.g. `<org>/gtm-client-<slug>`).
 2. Fill `client.yaml`: owners (GTM engineer, SDRs, **client approver**), regions, status `onboarding`.
 3. Walk the questionnaire in `context/intake.md` with the human. For each answer, write what the
    client said, not your interpretation. Unknown → write `unknown` and add it to open questions.

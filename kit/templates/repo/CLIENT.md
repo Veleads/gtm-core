@@ -4,7 +4,7 @@ Client-specific rules for agents and people working in this repo. Read after AGE
 
 Rules here may ADD steps or constraints to a stage. They may never remove a step, skip a check,
 or weaken a hard stop from AGENTS.md. If a core rule seems wrong for this client, propose the change
-in velead/gtm-core instead.
+in Veleads/gtm-core instead.
 
 ## Standing constraints
 - (e.g. Never target subsidiaries of X. Legal must review any mention of Y.)

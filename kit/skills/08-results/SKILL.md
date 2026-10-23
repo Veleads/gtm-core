@@ -23,7 +23,7 @@ Know what is working by segment × variant, protect deliverability, and feed lea
 5. Compare against brief metrics. Recommend changes (variant to pause, segment to expand), but
    copy changes go back through `05-copy` and its gate, and targeting changes through `01-icp`/`04-qualify`.
 6. Learnings that apply beyond this client → "Learnings → PRs" in the run log, then a
-   PR to velead/gtm-core editing the relevant skill (never edit `.gtm/` here).
+   PR to Veleads/gtm-core editing the relevant skill (never edit `.gtm/` here).
 
 ## Outputs
 Run log per pull; weekly report; suppression updated (DB).

@@ -1,7 +1,7 @@
 # AGENTS.md: gtm-core (developing the core)
 
 This is **gtm-core**: the reusable core of gtm-brain. It contains no client work. Each client has its
-own private repo (`velead/gtm-client-<slug>`) that installs this core as the package `@velead/gtm`,
+own private repo (`Veleads/gtm-client-<slug>`) that installs this core as the package `@veleads/gtm`,
 pinned to an exact version. The operator manual those repos follow is `kit/AGENTS.md`. **This file is
 for people and agents changing the core.**
 
@@ -14,7 +14,7 @@ for people and agents changing the core.**
 | `kit/templates/` | yes → `.gtm/templates/` (+ used by `gtm init` / `new-campaign`) | `repo/`, `client/`, `campaign/`, `outputs/` |
 | `kit/providers/` | yes → `.gtm/providers/` | one doc per vendor |
 | `kit/schemas/` | yes → `.gtm/schemas/` | JSON Schema, generated from `packages/schemas` |
-| `packages/cli` | yes, as the `gtm` binary in `@velead/gtm` | init, sync, validate, migrate, upgrade, status, job |
+| `packages/cli` | yes, as the `gtm` binary in `@veleads/gtm` | init, sync, validate, migrate, upgrade, status, job |
 | `packages/schemas` | bundled into the CLI | Zod schemas, file versions, features, migrations |
 | `packages/core` | no (used by workers) | adapter interfaces, waterfall, cost tracker |
 | `workers/`, `db/` | no (deployed centrally) | Hatchet workflows, Postgres schema |
@@ -47,7 +47,7 @@ Client repos upgrade on their own schedule, but **all of them run on the same de
 
 ## 3. Versioning and releases
 
-- Semver on `packages/cli/package.json` (`@velead/gtm`).
+- Semver on `packages/cli/package.json` (`@veleads/gtm`).
   - **patch**: fixes, doc/playbook clarifications. No client action.
   - **minor**: new optional features, new skills steps that add checks, new commands. No client action.
   - **major**: YAML schema bumps (with migrations), gate/stage changes, dropping N-1 support.
@@ -65,7 +65,7 @@ Client repos upgrade on their own schedule, but **all of them run on the same de
 pnpm install
 pnpm check            # typecheck + unit tests + kit schema freshness + validate examples/
 pnpm gtm <command>    # run the CLI from source, e.g. pnpm gtm validate --root examples/northwind
-pnpm build            # bundle @velead/gtm (dist/ + kit/ + CHANGELOG.md)
+pnpm build            # bundle @veleads/gtm (dist/ + kit/ + CHANGELOG.md)
 pnpm test:e2e         # pack the CLI, init a throwaway client repo, install, sync, validate
 ```
 

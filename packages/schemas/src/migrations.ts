@@ -30,7 +30,7 @@ export function migrateDocument(
   const raw = doc.get("version");
   const from = typeof raw === "number" ? raw : Number(raw);
   if (!Number.isInteger(from)) throw new Error(`${kind}: missing or invalid "version"`);
-  if (from > target) throw new Error(`${kind}: file is version ${from}, newer than this core (${target}). Upgrade @velead/gtm.`);
+  if (from > target) throw new Error(`${kind}: file is version ${from}, newer than this core (${target}). Upgrade @veleads/gtm.`);
 
   const applied: string[] = [];
   for (let v = from; v < target; v++) {
