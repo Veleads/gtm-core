@@ -5,6 +5,7 @@ approval:
   approved_by: "Maria Chen (client)"
   approved_at: 2026-09-12
   notes: "Approved on kickoff call; asked to start with UK manufacturing."
+  content_hash: sha256:8da28a0d63a9e806
 segments:
   - id: uk-manufacturing-mm
     description: UK manufacturers, 200-1500 employees

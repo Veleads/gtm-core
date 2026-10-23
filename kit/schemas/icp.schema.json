@@ -46,6 +46,11 @@
         },
         "notes": {
           "type": "string"
+        },
+        "content_hash": {
+          "description": "Fingerprint of the approved content, written by `gtm approve`. Never edit by hand.",
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{16}$"
         }
       },
       "required": [

@@ -1,5 +1,6 @@
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
+import { runApprove } from "./commands/approve.ts";
 import { runInit } from "./commands/init.ts";
 import { runJob } from "./commands/job.ts";
 import { runMigrate } from "./commands/migrate.ts";
@@ -16,6 +17,8 @@ const HELP = `gtm v${GTM_VERSION}: gtm-brain core CLI (run inside a client repo)
   gtm new-campaign <campaign-slug>                        scaffold campaigns/<slug>/
   gtm validate [campaign]                                 check repo against schemas, gates, data rules
   gtm status                                              campaigns, stages, gates
+  gtm approve icp --by "<Name (side)>" [--notes ..] [--date YYYY-MM-DD]
+  gtm approve copy <campaign> --by "<Name (side)>" [..]   record a sign-off and pin a hash of the approved content
   gtm sync [--check]                                      copy core kit into .gtm/ + AGENTS.md
   gtm migrate [--dry-run]                                 upgrade YAML files to current schema versions
   gtm upgrade [version] [--force]                         install newer core, sync, migrate, validate
@@ -29,6 +32,9 @@ const { values, positionals } = parseArgs({
     root: { type: "string" },
     name: { type: "string" },
     dir: { type: "string" },
+    by: { type: "string" },
+    notes: { type: "string" },
+    date: { type: "string" },
     check: { type: "boolean" },
     "dry-run": { type: "boolean" },
     force: { type: "boolean" },
@@ -48,6 +54,7 @@ function run(): boolean {
     case "new-campaign": return runNewCampaign(root, args[0]);
     case "validate": return runValidate(root, args[0]);
     case "status": return runStatus(root);
+    case "approve": return runApprove(root, args, { by: values.by, notes: values.notes, date: values.date });
     case "sync": return runSync(root, { check: values.check });
     case "migrate": return runMigrate(root, { dryRun: values["dry-run"] });
     case "upgrade": return runUpgrade(root, { version: args[0], force: values.force });
