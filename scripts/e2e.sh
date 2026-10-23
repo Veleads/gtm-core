@@ -53,6 +53,12 @@ echo "tampered" >> .gtm/skills/05-copy/SKILL.md
 if $PNPM exec gtm sync --check >/dev/null; then echo "expected sync --check to fail"; exit 1; fi
 $PNPM exec gtm sync >/dev/null && $PNPM exec gtm sync --check
 
+echo "• per-command help prints help and never runs the command"
+out=$($PNPM exec gtm validate --help)
+echo "$out" | grep -q "^Writes: Nothing" || { echo "expected validate --help to show help"; exit 1; }
+if echo "$out" | grep -q "validating"; then echo "validate --help must not run validate"; exit 1; fi
+test -f node_modules/@veleads/gtm/README.md || { echo "README missing from package"; exit 1; }
+
 echo "• status"
 $PNPM exec gtm status
 
