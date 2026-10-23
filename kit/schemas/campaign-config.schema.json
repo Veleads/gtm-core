@@ -1,0 +1,505 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "number",
+      "const": 1
+    },
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "campaign_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "intake",
+        "icp",
+        "tam",
+        "enrich",
+        "qualify",
+        "copy",
+        "qa",
+        "launch",
+        "results"
+      ],
+      "description": "The stage currently being worked on"
+    },
+    "tam_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "segments": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      },
+      "description": "Segment ids from icp.yaml"
+    },
+    "personas": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      },
+      "description": "Persona ids from icp.yaml"
+    },
+    "enrichment": {
+      "type": "object",
+      "properties": {
+        "email_waterfall": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "description": "Must match .gtm/providers/<slug>.md and a registered adapter"
+          },
+          "description": "Tried in order; stops at the first verified hit"
+        },
+        "verification": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]*$",
+              "description": "Must match .gtm/providers/<slug>.md and a registered adapter"
+            },
+            "accept": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "valid",
+                  "catch_all"
+                ]
+              }
+            }
+          },
+          "required": [
+            "provider",
+            "accept"
+          ]
+        },
+        "max_contacts_per_account": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "cache_ttl_days": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "email_waterfall",
+        "verification",
+        "max_contacts_per_account",
+        "cache_ttl_days"
+      ]
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string",
+          "const": "USD"
+        },
+        "max_total": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Hard cap for this campaign; jobs stop when reached"
+        },
+        "max_per_lead": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "currency",
+        "max_total",
+        "max_per_lead"
+      ]
+    },
+    "scoring": {
+      "type": "object",
+      "properties": {
+        "fit": {
+          "type": "object",
+          "properties": {
+            "segment_match": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "persona_role": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "enum": [
+                  "decision_maker",
+                  "champion",
+                  "influencer",
+                  "user"
+                ]
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "required": [
+                "decision_maker",
+                "champion",
+                "influencer",
+                "user"
+              ]
+            }
+          },
+          "required": [
+            "segment_match",
+            "persona_role"
+          ]
+        },
+        "signals": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "description": "Keys from signals.yaml; weights come from there"
+        },
+        "tiers": {
+          "type": "object",
+          "properties": {
+            "A": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "B": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "A",
+            "B"
+          ]
+        },
+        "send_tiers": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C"
+            ]
+          }
+        }
+      },
+      "required": [
+        "fit",
+        "signals",
+        "tiers",
+        "send_tiers"
+      ]
+    },
+    "suppression": {
+      "type": "object",
+      "properties": {
+        "lists": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "customers",
+              "open_deals",
+              "competitors",
+              "do_not_contact",
+              "past_bounces",
+              "unsubscribed"
+            ]
+          }
+        },
+        "recently_contacted_days": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "lists",
+        "recently_contacted_days"
+      ]
+    },
+    "sending": {
+      "type": "object",
+      "properties": {
+        "sender": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "description": "Must match .gtm/providers/<slug>.md and a registered adapter"
+        },
+        "sender_campaign_ref": {
+          "description": "ID in the sender tool, set at launch",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "domains": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "inboxes": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "daily_cap_per_inbox": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 50
+        },
+        "warmup_min_days": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1
+        },
+        "send_window": {
+          "type": "object",
+          "properties": {
+            "days": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "mon",
+                  "tue",
+                  "wed",
+                  "thu",
+                  "fri",
+                  "sat",
+                  "sun"
+                ]
+              }
+            },
+            "start": {
+              "type": "string",
+              "pattern": "^\\d{2}:\\d{2}$"
+            },
+            "end": {
+              "type": "string",
+              "pattern": "^\\d{2}:\\d{2}$"
+            }
+          },
+          "required": [
+            "days",
+            "start",
+            "end"
+          ]
+        }
+      },
+      "required": [
+        "sender",
+        "sender_campaign_ref",
+        "domains",
+        "inboxes",
+        "daily_cap_per_inbox",
+        "warmup_min_days",
+        "timezone",
+        "send_window"
+      ]
+    },
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "regions": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 2
+          }
+        },
+        "lawful_basis": {
+          "type": "string",
+          "enum": [
+            "legitimate_interest",
+            "consent",
+            "not_applicable"
+          ]
+        },
+        "lia_ref": {
+          "description": "Link/path to Legitimate Interest Assessment; required when basis is legitimate_interest",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "opt_out_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "privacy_notice_url": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "regions",
+        "lawful_basis",
+        "lia_ref",
+        "opt_out_text",
+        "privacy_notice_url"
+      ]
+    },
+    "gates": {
+      "type": "object",
+      "properties": {
+        "copy": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            },
+            "approved_by": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "approved_at": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "notes": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "approved_by",
+            "approved_at"
+          ]
+        },
+        "launch": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            },
+            "approved_by": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "approved_at": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "notes": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "approved_by",
+            "approved_at"
+          ]
+        }
+      },
+      "required": [
+        "copy",
+        "launch"
+      ]
+    }
+  },
+  "required": [
+    "version",
+    "client_id",
+    "campaign_id",
+    "owner",
+    "stage",
+    "tam_id",
+    "segments",
+    "personas",
+    "enrichment",
+    "budget",
+    "scoring",
+    "suppression",
+    "sending",
+    "compliance",
+    "gates"
+  ]
+}

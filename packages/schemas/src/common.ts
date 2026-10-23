@@ -1,0 +1,50 @@
+import { z } from "zod";
+
+/** Lowercase slug: letters, digits, hyphens. */
+export const Slug = z.string().regex(/^[a-z0-9][a-z0-9-]*$/, "lowercase letters, digits and hyphens");
+
+export const IsoDate = z.iso.date();
+export const IsoDateTime = z.iso.datetime({ offset: true });
+
+export const Domain = z
+  .string()
+  .regex(/^(?!-)[a-z0-9-]+(\.[a-z0-9-]+)+$/, "bare lowercase domain, e.g. acme.com");
+
+export const Tier = z.enum(["A", "B", "C"]);
+
+export const Stage = z.enum([
+  "intake",
+  "icp",
+  "tam",
+  "enrich",
+  "qualify",
+  "copy",
+  "qa",
+  "launch",
+  "results",
+]);
+export type Stage = z.infer<typeof Stage>;
+
+export const IntRange = z
+  .object({ min: z.number().int().nonnegative().optional(), max: z.number().int().positive().optional() })
+  .refine((r) => r.min === undefined || r.max === undefined || r.min <= r.max, "min must be <= max");
+
+/**
+ * A human approval. Agents never set `approved` on their own: only after a named human
+ * explicitly approves in the session (see AGENTS.md, "Hard stops").
+ */
+export const Approval = z
+  .object({
+    status: z.enum(["pending", "approved", "rejected"]),
+    approved_by: z.string().min(1).nullable(),
+    approved_at: IsoDate.nullable(),
+    notes: z.string().optional(),
+  })
+  .refine(
+    (a) => a.status !== "approved" || (a.approved_by !== null && a.approved_at !== null),
+    "approved requires approved_by and approved_at",
+  );
+export type Approval = z.infer<typeof Approval>;
+
+/** Where a field's value came from: provider slug, "client", "manual" or "derived". Required for GDPR. */
+export const FieldSources = z.record(z.string(), z.string().min(1));

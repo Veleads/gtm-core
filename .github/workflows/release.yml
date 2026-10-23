@@ -1,0 +1,43 @@
+name: release
+# Publishes @velead/gtm to npm with Trusted Publishing (OIDC): no npm token is stored anywhere.
+# npmjs.com → @velead/gtm → Settings → Trusted Publisher: GitHub Actions, org "velead",
+# repo "gtm-core", workflow "release.yml", environment "npm".
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # Environment "npm" with required reviewers: every publish waits for a human approval.
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write   # OIDC token for npm Trusted Publishing (and automatic provenance)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - name: npm CLI with Trusted Publishing support (>= 11.5.1)
+        run: npm install -g npm@^11.5.1 && npm --version
+      - run: pnpm install --frozen-lockfile
+      - name: Tag matches package version
+        run: |
+          v=$(node -p "require('./packages/cli/package.json').version")
+          test "v$v" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME != package v$v"; exit 1; }
+      - name: Changelog has an entry for this version
+        run: grep -q "^## \[$(node -p "require('./packages/cli/package.json').version")\]" CHANGELOG.md
+      - run: pnpm check
+      - run: pnpm test:e2e
+      # pnpm pack rewrites workspace: dependencies; npm publish performs the OIDC exchange.
+      - name: Pack
+        run: cd packages/cli && pnpm pack --pack-destination "$RUNNER_TEMP"
+      - name: Publish (OIDC, provenance generated automatically)
+        run: npm publish "$RUNNER_TEMP"/velead-gtm-*.tgz --access public

@@ -1,0 +1,38 @@
+version: 1
+client_id: northwind
+approval:
+  status: approved
+  approved_by: "Maria Chen (client)"
+  approved_at: 2026-09-12
+  notes: "Approved on kickoff call; asked to start with UK manufacturing."
+segments:
+  - id: uk-manufacturing-mm
+    description: UK manufacturers, 200-1500 employees
+    firmographics:
+      industries: [Manufacturing, Industrial Machinery, Food & Beverage Manufacturing]
+      employee_count: {min: 200, max: 1500}
+      hq_countries: [GB]
+      technologies_any: [Sage 200, Microsoft Dynamics NAV, SAP Business One]
+      keywords_none: [holding company]
+  - id: dach-wholesale-mm
+    description: DACH wholesale and distribution, 200-1000 employees
+    firmographics:
+      industries: [Wholesale, Distribution, Logistics]
+      employee_count: {min: 200, max: 1000}
+      hq_countries: [DE, AT, CH]
+personas:
+  - id: finance-leader
+    role: decision_maker
+    titles_any: [CFO, Chief Financial Officer, Finance Director, VP Finance, Head of Finance]
+    titles_none: [Assistant, Intern, Interim]
+    seniorities: [c_level, vp, head, director]
+    departments: [Finance]
+  - id: ap-owner
+    role: champion
+    titles_any: [Head of Accounts Payable, AP Manager, Financial Controller, Finance Operations Manager]
+    titles_none: [Assistant, Intern]
+    seniorities: [head, director, manager]
+    departments: [Finance]
+exclusions:
+  domains: [competitor-one.example, competitor-two.example, competitor-three.example]
+  industries: [Government, Financial Services, Banking]

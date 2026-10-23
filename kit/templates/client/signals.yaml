@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../.gtm/schemas/signals.schema.json
+version: 1
+client_id: __CLIENT_ID__
+signals:
+  - key: signal-one
+    description: TODO
+    level: account # account | contact
+    source_hint: job_postings # kind of source, not a vendor
+    weight: 20 # 0-100, added to the lead score when present and fresh
+    freshness_days: 60
+    messaging_angle: TODO

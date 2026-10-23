@@ -1,0 +1,17 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+*.tgz
+.DS_Store
+dist/
+
+# No client data in core. Lead lists, exports and dumps never go to git.
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.parquet
+*.sql.gz
+exports/

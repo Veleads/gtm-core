@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "account_domain": {
+      "type": "string",
+      "pattern": "^(?!-)[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+    },
+    "first_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "last_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "seniority": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "department": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "linkedin_url": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "country": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "email": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "email",
+          "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "email_status": {
+      "type": "string",
+      "enum": [
+        "valid",
+        "catch_all",
+        "invalid",
+        "unknown",
+        "not_found"
+      ]
+    },
+    "field_sources": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "client_id",
+    "account_domain",
+    "first_name",
+    "last_name",
+    "title",
+    "seniority",
+    "department",
+    "linkedin_url",
+    "country",
+    "email",
+    "email_status",
+    "field_sources"
+  ]
+}

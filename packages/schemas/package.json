@@ -1,0 +1,16 @@
+{
+  "name": "@gtm/schemas",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "export": "tsx scripts/export-json-schema.ts"
+  },
+  "dependencies": {
+    "zod": "^4.1.0",
+    "yaml": "^2.8.1"
+  }
+}

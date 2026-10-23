@@ -1,0 +1,45 @@
+name: gtm-upgrade
+# Opens a PR when a newer @velead/gtm is published. Requires repo setting:
+# Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests".
+on:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - name: Upgrade core (sync + migrate + validate)
+        id: upgrade
+        run: |
+          before=$(node -p "require('./package.json').devDependencies['@velead/gtm']")
+          pnpm exec gtm upgrade 2>&1 | tee upgrade.log || true
+          after=$(node -p "require('./package.json').devDependencies['@velead/gtm']")
+          echo "before=$before" >> "$GITHUB_OUTPUT"
+          echo "after=$after" >> "$GITHUB_OUTPUT"
+      - name: Open PR
+        if: steps.upgrade.outputs.before != steps.upgrade.outputs.after
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: upgrade/core-v${{ steps.upgrade.outputs.after }}
+          title: "chore: core ${{ steps.upgrade.outputs.before }} → ${{ steps.upgrade.outputs.after }}"
+          commit-message: "chore: core v${{ steps.upgrade.outputs.after }}"
+          body-path: upgrade.log
+          add-paths: |
+            package.json
+            pnpm-lock.yaml
+            AGENTS.md
+            .gtm/**
+            client.yaml
+            context/*.yaml
+            campaigns/*/config.yaml

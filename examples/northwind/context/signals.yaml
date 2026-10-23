@@ -1,0 +1,31 @@
+version: 1
+client_id: northwind
+signals:
+  - key: hiring-ap-staff
+    description: Open job posting for AP clerk / AP specialist / purchase ledger roles
+    level: account
+    source_hint: job_postings
+    weight: 30
+    freshness_days: 45
+    messaging_angle: "Hiring to keep up with invoice volume. Position automation as the alternative to another AP hire."
+  - key: new-finance-leader
+    description: New CFO / Finance Director started in the last 6 months
+    level: contact
+    source_hint: job_changes
+    weight: 25
+    freshness_days: 180
+    messaging_angle: "New leaders review the finance stack in their first 6 months. Offer a quick AP benchmark."
+  - key: erp-migration
+    description: Evidence of ERP change (job posts mentioning migration, new ERP in tech stack)
+    level: account
+    source_hint: tech_install
+    weight: 20
+    freshness_days: 120
+    messaging_angle: "ERP migration is the moment to fix AP rather than port the manual process over."
+  - key: rapid-growth
+    description: Headcount growth >15% in 12 months
+    level: account
+    source_hint: headcount_trend
+    weight: 10
+    freshness_days: 90
+    messaging_angle: "Invoice volume grows with the business; the AP team usually does not."

@@ -1,0 +1,60 @@
+version: 1
+client_id: northwind
+campaign_id: uk-mfg-hiring
+owner: jdoe
+stage: copy # current stage; see AGENTS.md routing table
+tam_id: example-tam-2026q4
+segments: [uk-manufacturing-mm]
+personas: [finance-leader, ap-owner]
+
+enrichment:
+  email_waterfall: [mock-finder-a, mock-finder-b] # provider order; replace with real provider slugs
+  verification:
+    provider: mock-verifier
+    accept: [valid] # add catch_all only with a deliberate decision in the run log
+  max_contacts_per_account: 2
+  cache_ttl_days: 90
+
+budget:
+  currency: USD
+  max_total: 300
+  max_per_lead: 0.4
+
+scoring:
+  fit:
+    segment_match: 40
+    persona_role: {decision_maker: 30, champion: 20, influencer: 5, user: 0}
+  signals: [hiring-ap-staff, new-finance-leader, erp-migration, rapid-growth]
+  tiers: {A: 90, B: 70} # score >= A -> A, >= B -> B, else C
+  send_tiers: [A, B]
+
+suppression:
+  lists: [customers, open_deals, competitors, do_not_contact, past_bounces, unsubscribed]
+  recently_contacted_days: 90
+
+sending:
+  sender: plusvibe
+  sender_campaign_ref: null # set by the launch job
+  domains: [northwind-ledger-mail.example, getnorthwind.example, northwindap.example]
+  inboxes: 6
+  daily_cap_per_inbox: 30
+  warmup_min_days: 14
+  timezone: Europe/London
+  send_window: {days: [mon, tue, wed, thu], start: "08:00", end: "16:30"}
+
+compliance:
+  regions: [UK]
+  lawful_basis: legitimate_interest
+  lia_ref: "Client drive: Legal/LIA-outbound-2026-09-10.pdf"
+  opt_out_text: "Not relevant? Reply 'no thanks' and I won't contact you again."
+  privacy_notice_url: https://northwind-ledger.example/privacy
+
+gates:
+  copy:
+    status: pending
+    approved_by: null
+    approved_at: null
+  launch:
+    status: pending
+    approved_by: null
+    approved_at: null

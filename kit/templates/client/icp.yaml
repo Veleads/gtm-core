@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=../.gtm/schemas/icp.schema.json
+version: 1
+client_id: __CLIENT_ID__
+approval:
+  status: pending # only a named human approves (AGENTS.md hard stop)
+  approved_by: null
+  approved_at: null
+segments:
+  - id: segment-one
+    description: TODO
+    firmographics:
+      industries: []
+      employee_count: {min: 50, max: 1000}
+      hq_countries: []
+personas:
+  - id: persona-one
+    role: decision_maker
+    titles_any: [TODO]
+    seniorities: []
+    departments: []
+exclusions:
+  domains: []
+  industries: []

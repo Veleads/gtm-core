@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "number",
+      "const": 1
+    },
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "signals": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "account",
+              "contact"
+            ]
+          },
+          "source_hint": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Kind of source, e.g. job_postings, funding, tech_install. Not a vendor."
+          },
+          "weight": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "freshness_days": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991,
+            "description": "Signal is ignored when older than this"
+          },
+          "messaging_angle": {
+            "type": "string",
+            "minLength": 1,
+            "description": "How copy should use this signal"
+          }
+        },
+        "required": [
+          "key",
+          "description",
+          "level",
+          "source_hint",
+          "weight",
+          "freshness_days",
+          "messaging_angle"
+        ]
+      }
+    }
+  },
+  "required": [
+    "version",
+    "client_id",
+    "signals"
+  ]
+}

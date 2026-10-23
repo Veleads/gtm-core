@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../.gtm/schemas/campaign-config.schema.json
+version: 1
+client_id: __CLIENT_ID__
+campaign_id: __CAMPAIGN_ID__
+owner: __OWNER__
+stage: icp
+tam_id: __CLIENT_ID__-tam-TODO
+segments: [segment-one]
+personas: [persona-one]
+
+enrichment:
+  email_waterfall: [TODO-provider]
+  verification:
+    provider: TODO-provider
+    accept: [valid]
+  max_contacts_per_account: 2
+  cache_ttl_days: 90
+
+budget:
+  currency: USD
+  max_total: 100
+  max_per_lead: 0.4
+
+scoring:
+  fit:
+    segment_match: 40
+    persona_role: {decision_maker: 30, champion: 20, influencer: 5, user: 0}
+  signals: [signal-one]
+  tiers: {A: 90, B: 70}
+  send_tiers: [A, B]
+
+suppression:
+  lists: [customers, open_deals, competitors, do_not_contact, past_bounces, unsubscribed]
+  recently_contacted_days: 90
+
+sending:
+  sender: TODO-provider
+  sender_campaign_ref: null
+  domains: [TODO]
+  inboxes: 1
+  daily_cap_per_inbox: 30
+  warmup_min_days: 14
+  timezone: Europe/London
+  send_window: {days: [mon, tue, wed, thu], start: "08:00", end: "16:30"}
+
+compliance:
+  regions: [TODO]
+  lawful_basis: legitimate_interest
+  lia_ref: null
+  opt_out_text: TODO
+  privacy_notice_url: null
+
+gates:
+  copy: {status: pending, approved_by: null, approved_at: null}
+  launch: {status: pending, approved_by: null, approved_at: null}

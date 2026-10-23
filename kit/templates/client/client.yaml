@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=.gtm/schemas/client.schema.json
+version: 1
+client_id: __CLIENT_ID__
+name: __CLIENT_NAME__
+status: onboarding
+started_at: __TODAY__
+owners:
+  gtm_engineer: TODO
+  sdrs: []
+  client_approver: TODO # client-side person who signs off ICP and copy
+regions: [TODO]
+features: {} # opt-in core features (see .gtm/ CHANGELOG / FEATURES)

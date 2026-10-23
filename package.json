@@ -1,0 +1,29 @@
+{
+  "name": "gtm-core",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@10.34.7",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "gtm": "tsx packages/cli/src/cli.ts",
+    "build": "pnpm --filter @velead/gtm build",
+    "schemas:export": "pnpm --filter @gtm/schemas export",
+    "schemas:check": "pnpm schemas:export >/dev/null && git diff --exit-code -- kit/schemas",
+    "db:generate": "pnpm --filter @gtm/db generate",
+    "db:migrate": "pnpm --filter @gtm/db migrate",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --import tsx --test 'packages/*/src/**/*.test.ts'",
+    "test:e2e": "bash scripts/e2e.sh",
+    "validate:examples": "pnpm gtm validate --root examples/northwind",
+    "check": "pnpm typecheck && pnpm test && pnpm validate:examples && pnpm guard:public",
+    "guard:public": "bash scripts/public-guard.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

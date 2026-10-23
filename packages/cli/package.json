@@ -1,0 +1,51 @@
+{
+  "name": "@velead/gtm",
+  "version": "0.1.0",
+  "description": "gtm-brain core: process kit (AGENTS.md, skills, templates, schemas) and the gtm CLI for client repos",
+  "keywords": [
+    "gtm",
+    "outbound",
+    "sales",
+    "agents",
+    "claude-code",
+    "codex",
+    "agent-skills",
+    "playbooks"
+  ],
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/velead/gtm-core.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "gtm": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "kit",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "node scripts/copy-kit.mjs && tsup",
+    "prepack": "pnpm run build"
+  },
+  "dependencies": {
+    "yaml": "^2.8.1",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@gtm/schemas": "workspace:*",
+    "tsup": "^8.5.0"
+  },
+  "homepage": "https://github.com/velead/gtm-core#readme",
+  "bugs": {
+    "url": "https://github.com/velead/gtm-core/issues"
+  }
+}
