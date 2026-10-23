@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { parse } from "yaml";
 import type { z } from "zod";
 import {
-  CampaignConfig, ClientFile, FEATURES, FILE_VERSIONS, IcpFile, SignalsFile, Stage, icpContentHash, type FileKind,
+  CampaignConfig, ClientFile, FEATURES, FILE_VERSIONS, IcpFile, SignalsFile, Stage, copyContentHash, icpContentHash, type Approval, type FileKind,
 } from "@gtm/schemas";
 import { Report, subdirs, walk } from "../fsutil.ts";
 import { GTM_VERSION, KIT_DIR, PACKAGE_NAME } from "../paths.ts";
@@ -71,19 +71,18 @@ function checkNoLeadData(r: Report, root: string) {
 }
 
 /**
- * The ICP gate holds only while icp.yaml is unchanged since approval. Approvals recorded before
+ * A pinned gate holds only while its content is unchanged since approval. Approvals recorded before
  * hashes existed (no content_hash) still count, with a warning to pin them.
  */
-function checkIcpApproval(r: Report, file: string, icp: IcpFile): boolean {
-  if (icp.approval.status !== "approved") return false;
-  const pinned = icp.approval.content_hash;
+function checkPinnedApproval(r: Report, contentFile: string, approval: Approval, current: string, what: string, approveCmd: string): boolean {
+  if (approval.status !== "approved") return false;
+  const pinned = approval.content_hash;
   if (!pinned) {
-    r.warn(file, `approved without a content hash: pin it with \`pnpm gtm approve icp --by "${icp.approval.approved_by}" --date ${icp.approval.approved_at}\``);
+    r.warn(contentFile, `${what} approved without a content hash: pin it with \`${approveCmd} --by "${approval.approved_by}" --date ${approval.approved_at}\``);
     return true;
   }
-  const current = icpContentHash(parse(readFileSync(file, "utf8")));
   if (current === pinned) return true;
-  r.err(file, `changed after approval (approved ${pinned}, now ${current}). Re-present the ICP to the client approver and record it with \`pnpm gtm approve icp --by "<name>"\`, or revert the change`);
+  r.err(contentFile, `${what} changed after approval (approved ${pinned}, now ${current}). Re-present it to the approver and record it with \`${approveCmd} --by "<name>"\`, or revert the change`);
   return false;
 }
 
@@ -121,13 +120,17 @@ function validateCampaign(r: Report, root: string, clientId: string, campaign: s
     if (stageIndex(cfg.stage) > stageIndex("icp") && !icpApproved) {
       r.err(cfgFile, `stage is "${cfg.stage}" but the ICP gate (context/icp.yaml approval) is not approved, or the ICP changed since approval`);
     }
-    if (stageIndex(cfg.stage) > stageIndex("copy") && cfg.gates.copy.status !== "approved") {
-      r.err(cfgFile, `stage is "${cfg.stage}" but gates.copy is not approved`);
+    const copyFile = join(dir, "copy.md");
+    const copyApproved = existsSync(copyFile)
+      ? checkPinnedApproval(r, copyFile, cfg.gates.copy, copyContentHash(readFileSync(copyFile, "utf8")), "copy", `pnpm gtm approve copy ${campaign}`)
+      : false;
+    if (stageIndex(cfg.stage) > stageIndex("copy") && !copyApproved) {
+      r.err(cfgFile, `stage is "${cfg.stage}" but gates.copy is not approved, or copy.md changed since approval`);
     }
     if (stageIndex(cfg.stage) > stageIndex("launch") && cfg.gates.launch.status !== "approved") {
       r.err(cfgFile, `stage is "${cfg.stage}" but gates.launch is not approved`);
     }
-    if (cfg.gates.launch.status === "approved" && cfg.gates.copy.status !== "approved") {
+    if (cfg.gates.launch.status === "approved" && !copyApproved) {
       r.err(cfgFile, "gates.launch is approved but gates.copy is not");
     }
     if (stageIndex(cfg.stage) > stageIndex("qa") && !existsSync(join(dir, "qa.md"))) {
@@ -164,7 +167,9 @@ export function runValidate(root: string, onlyCampaign?: string): boolean {
   const signals = existsSync(sigFile) ? loadVersioned(r, sigFile, "signals", SignalsFile) : null;
   if (meta && icp && icp.client_id !== clientId) r.err(icpFile, `client_id "${icp.client_id}" does not match client.yaml "${clientId}"`);
   if (meta && signals && signals.client_id !== clientId) r.err(sigFile, `client_id "${signals.client_id}" does not match client.yaml "${clientId}"`);
-  const icpApproved = icp ? checkIcpApproval(r, icpFile, icp) : false;
+  const icpApproved = icp
+    ? checkPinnedApproval(r, icpFile, icp.approval, icpContentHash(parse(readFileSync(icpFile, "utf8"))), "ICP", "pnpm gtm approve icp")
+    : false;
 
   checkNoLeadData(r, root);
 

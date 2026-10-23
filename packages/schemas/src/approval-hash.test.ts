@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { parse } from "yaml";
-import { icpContentHash } from "./approval-hash.ts";
+import { copyContentHash, icpContentHash } from "./approval-hash.ts";
 
 const base = `version: 1
 client_id: acme
@@ -50,4 +50,30 @@ test("any content change does change the hash", () => {
 
 test("format is sha256 with 16 hex chars", () => {
   assert.match(hash(base), /^sha256:[0-9a-f]{16}$/);
+});
+
+const copy = `# Copy: q1
+
+> Status: **awaiting client sign-off**
+> Variables: {{first_name}}
+
+## Variant A
+**Step 1.** Subject: \`AP hire at {{company_name}}\`
+
+Hi {{first_name}},
+
+We moved close from day 9 to day 4.
+`;
+
+test("copy: note lines, line endings, trailing spaces and blank-line runs do not count", () => {
+  const touched = copy.replace("awaiting client sign-off", "approved by Maria")
+    .replace("> Variables: {{first_name}}", "> Variables: {{first_name}}, {{company_name}}")
+    .replace(/\n/g, "\r\n").replace("Hi {{first_name}},", "Hi {{first_name}},   ") + "\n\n\n";
+  assert.equal(copyContentHash(touched), copyContentHash(copy));
+});
+
+test("copy: any change to the email text changes the hash", () => {
+  assert.notEqual(copyContentHash(copy.replace("day 4", "day 5")), copyContentHash(copy));
+  assert.notEqual(copyContentHash(copy.replace("AP hire at", "AP hiring at")), copyContentHash(copy));
+  assert.notEqual(copyContentHash(copy + "\n**Step 2.** Follow-up\n"), copyContentHash(copy));
 });

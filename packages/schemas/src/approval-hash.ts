@@ -20,3 +20,20 @@ export function icpContentHash(icp: Record<string, unknown>): string {
   const { approval: _approval, version: _version, ...content } = icp;
   return `sha256:${createHash("sha256").update(stableStringify(content)).digest("hex").slice(0, 16)}`;
 }
+
+/**
+ * Fingerprint of approved copy (campaigns/<campaign>/copy.md). Note lines starting with ">" (status,
+ * available variables) don't count, and neither do line endings, trailing spaces or runs of blank
+ * lines. Every other character of the copy does.
+ */
+export function copyContentHash(markdown: string): string {
+  const normalized = markdown
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .filter((line) => !/^\s*>/.test(line))
+    .map((line) => line.trimEnd())
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return `sha256:${createHash("sha256").update(normalized).digest("hex").slice(0, 16)}`;
+}

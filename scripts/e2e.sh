@@ -39,6 +39,15 @@ if $PNPM exec gtm validate >/dev/null; then echo "expected validate to fail afte
 $PNPM exec gtm approve icp --by "E2E Approver (client)" >/dev/null
 $PNPM exec gtm validate | tail -1
 
+echo "• copy approval is pinned; status-line edits are fine, copy edits are caught"
+$PNPM exec gtm approve copy uk-mfg-hiring --by "E2E Approver (client)" >/dev/null
+perl -pi -e 's/awaiting client sign-off/approved/' campaigns/uk-mfg-hiring/copy.md
+$PNPM exec gtm validate | tail -1
+perl -pi -e 's/day 9 to day 4/day 9 to day 3/' campaigns/uk-mfg-hiring/copy.md
+if $PNPM exec gtm validate >/dev/null; then echo "expected validate to fail after copy change"; exit 1; fi
+$PNPM exec gtm approve copy uk-mfg-hiring --by "E2E Approver (client)" >/dev/null
+$PNPM exec gtm validate | tail -1
+
 echo "• hand-edited core file is caught"
 echo "tampered" >> .gtm/skills/05-copy/SKILL.md
 if $PNPM exec gtm sync --check >/dev/null; then echo "expected sync --check to fail"; exit 1; fi

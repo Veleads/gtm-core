@@ -27,8 +27,10 @@ the client approved.
    a variable.
 5. Self-review against the checklist below, then render each step once with a fictional example
    lead (fictional name and company) for the human.
-6. **HARD STOP.** Present all variants for client sign-off. Record per AGENTS.md section 4 in
-   `config.yaml` → `gates.copy`. Edits requested → change, re-present, still pending.
+6. **HARD STOP.** Present all variants for client sign-off. Edits requested → change, re-present,
+   still pending. Only after explicit approval from the named approver, record it:
+   `pnpm gtm approve copy <campaign> --by "<Name (client)>" --notes "<what was approved>"`. Quote the
+   approval in the run log and commit `copy.md`, `config.yaml` and the run log together.
 
 ## Outputs
 `copy.md` (status line at top reflects the gate). Run log.
@@ -39,11 +41,14 @@ the client approved.
 - [ ] Every variable exists in the qualify job output
 - [ ] Opt-out line in step 1 of every variant
 - [ ] No banned words from voice.md; no spam-trigger formatting (all caps, many links, images)
+- [ ] Status and notes in `>` lines only, so updating them never resets the approval
 - [ ] Plain-text friendly; at most one link, none in step 1 preferred
 
 ## Gate
-**Client copy sign-off (hard stop).** `gates.copy.status: approved` with name and date. Any copy
-change afterwards resets it to `pending`.
+**Client copy sign-off (hard stop).** Recorded with `pnpm gtm approve copy <campaign>`, which pins a
+hash of `copy.md`. Any later change to the copy makes `pnpm gtm validate` fail and blocks the campaign
+past `copy` until it is re-approved (or the change is reverted). Note lines starting with `>` (status,
+available variables) and whitespace-only changes do not count.
 
 ## Next
 `.gtm/skills/06-qa/SKILL.md`
