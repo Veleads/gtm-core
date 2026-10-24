@@ -17,7 +17,7 @@ for people and agents changing the core.**
 | `packages/cli` | yes, as the `gtm` binary in `@veleads/gtm` | init, sync, validate, migrate, upgrade, status, job |
 | `packages/schemas` | bundled into the CLI | Zod schemas, file versions, features, migrations |
 | `packages/core` | no (used by workers) | adapter interfaces, waterfall, cost tracker |
-| `workers/`, `db/` | no (deployed centrally) | Hatchet workflows, Postgres schema |
+| `workers/`, `db/` | no (deployed centrally) | Hatchet workflows; Postgres via Prisma (`db/prisma/schema.prisma`) |
 | `examples/northwind/` | no | fictional project repo used as a test fixture |
 
 Project repos receive core only through releases.
@@ -71,6 +71,11 @@ pnpm test:e2e         # pack the CLI, init a throwaway project repo, install, sy
 
 - Branches `feat/…`, `fix/…`, `playbook/…`; PR to `main`; CODEOWNERS review. External PRs welcome (CONTRIBUTING.md).
 - After changing `packages/schemas`, run `pnpm schemas:export` (kit/schemas is checked in CI).
+- DB changes: edit `db/prisma/schema.prisma`, then `pnpm --filter @gtm/db migrate:dev --name <change>`
+  against the local docker Postgres, and commit the generated `db/prisma/migrations/` folder. Keep
+  table/column names snake_case (`@@map`/`@map`). Bulk writes in workers use `$executeRaw` with
+  `INSERT … ON CONFLICT` (Prisma's `upsert` is one row at a time). The client is generated on
+  `pnpm install` into `db/src/generated/` (git-ignored).
 - Keep `examples/northwind` valid and realistic: it is the fixture every release is tested against.
   When you add a migration, add a test that runs it on a copy of the fixture.
 - Keep files small and boring. TypeScript strict, pnpm, Node ≥ 22.

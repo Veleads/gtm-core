@@ -21,3 +21,7 @@ Workers accept the current and previous schema version of every file kind (see A
 
 Rules: every workflow run creates a `runs` row first, passes `RunContext` everywhere, and prints
 `run_id`, counts and cost on completion. `gtm job <name> <campaign>` triggers workflows and waits.
+
+Database access goes through `@gtm/db` (Prisma). Per-row reads and writes use the typed client;
+bulk idempotent writes (TAM upserts, enrichment cache, lead statuses) use `db.$executeRaw` with
+`INSERT … ON CONFLICT`, one statement per batch, never a loop of single-row upserts.
