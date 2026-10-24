@@ -3,3 +3,8 @@ packages:
   - db
 onlyBuiltDependencies:
   - esbuild
+
+# Security overrides (Dependabot). Remove when upstream ships fixed versions.
+overrides:
+  # GHSA-67mh-4wv8-2f99 (<=0.24.2, via drizzle-kit → @esbuild-kit) and GHSA-g7r4-m6w7-qqqr (<0.28.1, via tsup)
+  esbuild: ">=0.28.1"
