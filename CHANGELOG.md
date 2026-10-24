@@ -4,6 +4,8 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+
+## [0.7.0] - 2026-10-24
 - **opt-in** `gtm stack up | down [--wipe] | status`: each project repo runs its own stack (Postgres +
   hatchet-lite + gtm worker) on Docker, as compose project `gtm-<project_id>` with its own volumes. The
   worker is the image `ghcr.io/veleads/gtm-worker:<version>` matching the pinned core; it applies
