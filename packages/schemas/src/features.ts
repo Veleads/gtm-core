@@ -1,6 +1,6 @@
 /**
- * Opt-in capabilities. New behaviour that changes what a client gets ships here, off by default,
- * and becomes the default only in the next major release. Clients enable it in client.yaml:
+ * Opt-in capabilities. New behaviour that changes what a project gets ships here, off by default,
+ * and becomes the default only in the next major release. Projects enable it in project.yaml:
  *   features:
  *     some-feature: true
  */

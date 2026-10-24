@@ -1,6 +1,6 @@
 # Intake: Northwind Ledger
 
-> Fictional example. Filled from `templates/client/intake.md`. Stage 0 output.
+> Fictional example. Filled from `templates/project/intake.md`. Stage 0 output.
 
 ## Company
 - **What they sell:** Accounts-payable automation (invoice capture, approval routing, payment runs) for mid-market finance teams.
@@ -21,11 +21,11 @@
 ## Access checklist
 | Item | Owner | Status |
 |---|---|---|
-| CRM export: customers + open deals (domains only) for suppression | client | received 2026-09-05 |
-| Do-not-contact list | client | received 2026-09-05 |
-| Sending domains purchased (3) | agency | done |
-| Inboxes created (6) + warmup started | agency | warmup since 2026-09-08 |
-| Sender workspace (plusvibe) created for client | agency | done |
-| Calendar link for booked meetings | client | done |
-| Legitimate Interest Assessment signed | client + agency | done 2026-09-10 |
-| Named approver for ICP + copy | client | Maria Chen |
+| CRM export: customers + open deals (domains only) for suppression | stakeholder | received 2026-09-05 |
+| Do-not-contact list | stakeholder | received 2026-09-05 |
+| Sending domains purchased (3) | GTM team | done |
+| Inboxes created (6) + warmup started | GTM team | warmup since 2026-09-08 |
+| Sender workspace (plusvibe) created for the project | GTM team | done |
+| Calendar link for booked meetings | stakeholder | done |
+| Legitimate Interest Assessment signed | stakeholder + GTM team | done 2026-09-10 |
+| Named approver for ICP + copy | stakeholder | Maria Chen |

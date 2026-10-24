@@ -13,8 +13,8 @@ Catch every avoidable problem before a single email is sent. QA is a checklist, 
 - `.gtm/templates/outputs/qa-report.md`
 
 ## Steps
-1. `pnpm gtm validate <campaign>` must pass.
-2. `pnpm gtm job qa <campaign>`: validates every lead in send tiers against the `Lead` schema
+1. `npx gtm validate <campaign>` must pass.
+2. `npx gtm job qa <campaign>`: validates every lead in send tiers against the `Lead` schema
    (`.gtm/schemas/lead.schema.json`: verified email, allowed tier, suppression checked, `field_sources.email`
    present), checks every copy variable is filled, prints counts and rejection reasons.
 3. Re-run suppression if the last check is older than 24h at planned launch time.

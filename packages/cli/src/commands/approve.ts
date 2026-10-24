@@ -1,7 +1,7 @@
 // Records a human sign-off and pins a hash of the approved content, so `gtm validate` fails if the
 // content changes afterwards without a new approval. Run only after the approver said yes in session.
-//   gtm approve icp --by "<Name (side)>" [--notes ".."] [--date YYYY-MM-DD]
-//   gtm approve copy <campaign> --by "<Name (side)>" [--notes ".."] [--date YYYY-MM-DD]
+//   gtm approve icp --by "<Name (role)>" [--notes ".."] [--date YYYY-MM-DD]
+//   gtm approve copy <campaign> --by "<Name (role)>" [--notes ".."] [--date YYYY-MM-DD]
 // The launch gate is recorded by hand in config.yaml (its content is the lead set in Postgres).
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -10,13 +10,13 @@ import type { z } from "zod";
 import { CampaignConfig, IcpFile, IsoDate, copyContentHash, icpContentHash } from "@gtm/schemas";
 
 const USAGE = `Usage:
-  gtm approve icp --by "<Name (side)>" [--notes "<what was approved>"] [--date YYYY-MM-DD]
-  gtm approve copy <campaign> --by "<Name (side)>" [--notes "<what was approved>"] [--date YYYY-MM-DD]`;
+  gtm approve icp --by "<Name (role)>" [--notes "<what was approved>"] [--date YYYY-MM-DD]
+  gtm approve copy <campaign> --by "<Name (role)>" [--notes "<what was approved>"] [--date YYYY-MM-DD]`;
 
 interface Opts { by?: string; notes?: string; date?: string }
 
 function load(file: string): Document | null {
-  if (!existsSync(file)) { console.error(`${file} not found: run this from the root of a client repo`); return null; }
+  if (!existsSync(file)) { console.error(`${file} not found: run this from the root of a project repo`); return null; }
   const doc = parseDocument(readFileSync(file, "utf8"));
   if (doc.errors.length) { console.error(`${file}: invalid YAML: ${doc.errors[0]!.message}`); return null; }
   return doc;
@@ -49,7 +49,7 @@ export function runApprove(root: string, args: string[], opts: Opts): boolean {
     return false;
   }
   const by = opts.by?.trim();
-  if (!by) { console.error('--by is required: the human who approved, e.g. --by "Maria Chen (client)"'); return false; }
+  if (!by) { console.error('--by is required: the human who approved, e.g. --by "Maria Chen (VP Marketing)"'); return false; }
   const date = opts.date ?? new Date().toISOString().slice(0, 10);
   if (!IsoDate.safeParse(date).success) { console.error(`--date must be YYYY-MM-DD (got "${date}")`); return false; }
 

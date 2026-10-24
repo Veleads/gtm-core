@@ -1,24 +1,24 @@
-# gtm-client-__CLIENT_ID__ · __CLIENT_NAME__
+# gtm-project-__PROJECT_ID__ · __PROJECT_NAME__
 
-Private client repo. Runs the standard gtm-brain process from the public core package
+Private project repo. Runs the standard gtm-brain process from the public core package
 [`@veleads/gtm`](https://www.npmjs.com/package/@veleads/gtm), pinned in
-`package.json`. **Start with AGENTS.md** (generated from core; do not edit) and then CLIENT.md.
+`package.json`. **Start with AGENTS.md** (generated from core; do not edit) and then PROJECT.md.
 
 ## Setup
 ```bash
-pnpm install
+npm install          # or: pnpm install / yarn install
 cp .env.example .env
-pnpm gtm status
-pnpm gtm validate
+npx gtm status
+npx gtm validate
 ```
 
 ## What lives where
 | Path | Owner | Edit? |
 |---|---|---|
 | `AGENTS.md`, `.gtm/` | core (`gtm sync`) | never: changes go to Veleads/gtm-core |
-| `CLIENT.md` | this client | yes: client-specific additions only |
-| `client.yaml`, `context/`, `tam/`, `campaigns/` | this client | yes: through the stage playbooks |
+| `PROJECT.md` | this project | yes: project-specific additions only |
+| `project.yaml`, `context/`, `tam/`, `campaigns/` | this project | yes: through the stage playbooks |
 
 ## Core upgrades
 A weekly workflow opens a PR when a new core is released (`.github/workflows/gtm-upgrade.yml`).
-Manually: `pnpm gtm upgrade` (refuses while a campaign is between QA and launch).
+Manually: `npx gtm upgrade` (refuses while a campaign is between QA and launch).

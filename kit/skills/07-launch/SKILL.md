@@ -12,15 +12,15 @@ Get the approved leads and copy into the sender safely, and start sending only o
 - `qa.md` (ready: yes), `config.yaml` → `sending`, `gates.copy` (approved), `copy.md`
 
 ## Steps
-1. Verify: `gates.copy.status == approved`, `qa.md` ready, `pnpm gtm validate` passes. Otherwise stop.
-2. `pnpm gtm job push <campaign>`: creates the sender campaign **paused**, uploads the
+1. Verify: `gates.copy.status == approved`, `qa.md` ready, `npx gtm validate` passes. Otherwise stop.
+2. `npx gtm job push <campaign>`: creates the sender campaign **paused**, uploads the
    sequence from `copy.md`, pushes leads in send tiers, sets the schedule from `sending`. Write the
    returned reference into `config.yaml` → `sending.sender_campaign_ref`.
 3. Read the push counts: accepted vs. rejected (with reasons). Rejections > 2% → investigate first.
 4. **HARD STOP: go/no-go.** Present: leads pushed by tier, daily volume and ramp, first send
    date/time, spend so far vs. cap, QA summary, sender campaign ref (paused). Ask the campaign owner
    or GTM engineer for an explicit go. Record in `config.yaml` → `gates.launch` per AGENTS.md section 4.
-5. Only after approval: `pnpm gtm job activate <campaign>`. Set `stage: results`.
+5. Only after approval: `npx gtm job activate <campaign>`. Set `stage: results`.
 6. Run log: push counts, who approved, exact time activated.
 
 ## Outputs

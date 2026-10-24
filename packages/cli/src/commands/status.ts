@@ -1,4 +1,4 @@
-// gtm status: one-screen view of this client repo. Cross-client portfolio view comes from Postgres (Phase 2).
+// gtm status: one-screen view of this project repo. Cross-project portfolio view comes from Postgres (Phase 2).
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse } from "yaml";
@@ -14,9 +14,9 @@ export function campaignStages(root: string): { id: string; stage: string }[] {
 }
 
 export function runStatus(root: string): boolean {
-  const client = readYaml(join(root, "client.yaml"));
+  const project = readYaml(join(root, "project.yaml"));
   const icp = readYaml(join(root, "context", "icp.yaml"));
-  console.log(`${client?.name ?? "?"} (${client?.client_id ?? "?"}) · status ${client?.status ?? "?"} · core v${GTM_VERSION}`);
+  console.log(`${project?.name ?? "?"} (${project?.project_id ?? "?"}) · status ${project?.status ?? "?"} · core v${GTM_VERSION}`);
   console.log(`ICP gate: ${icp?.approval?.status ?? "?"}${icp?.approval?.approved_by ? ` by ${icp.approval.approved_by} on ${icp.approval.approved_at}` : ""}\n`);
 
   const rows = subdirs(join(root, "campaigns")).map((id) => {
@@ -25,7 +25,7 @@ export function runStatus(root: string): boolean {
     const last = existsSync(runsDir) ? readdirSync(runsDir).filter((f) => f.endsWith(".md")).sort().at(-1) ?? "-" : "-";
     return [id, cfg.stage ?? "?", cfg.gates?.copy?.status ?? "?", cfg.gates?.launch?.status ?? "?", cfg.owner ?? "?", last];
   });
-  if (!rows.length) { console.log("no campaigns yet: pnpm gtm new-campaign <campaign-slug>"); return true; }
+  if (!rows.length) { console.log("no campaigns yet: npx gtm new-campaign <campaign-slug>"); return true; }
 
   const header = ["campaign", "stage", "copy gate", "launch gate", "owner", "latest run log"];
   const widths = header.map((h, i) => Math.max(h.length, ...rows.map((r) => String(r[i]).length)));

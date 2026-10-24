@@ -1,12 +1,13 @@
-// gtm validate [campaign]: checks a client repo against the installed core's schemas and rules.
+// gtm validate [campaign]: checks a project repo against the installed core's schemas and rules.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse } from "yaml";
 import type { z } from "zod";
 import {
-  CampaignConfig, ClientFile, FEATURES, FILE_VERSIONS, IcpFile, SignalsFile, Stage, copyContentHash, icpContentHash, type Approval, type FileKind,
+  CampaignConfig, ProjectFile, FEATURES, FILE_VERSIONS, IcpFile, SignalsFile, Stage, copyContentHash, icpContentHash, type Approval, type FileKind,
 } from "@gtm/schemas";
 import { Report, subdirs, walk } from "../fsutil.ts";
+import { pendingRenames } from "./migrate.ts";
 import { GTM_VERSION, KIT_DIR, PACKAGE_NAME } from "../paths.ts";
 
 const REQUIRED_CONTEXT = ["intake.md", "icp.md", "icp.yaml", "signals.yaml", "personas.md", "offer.md", "proof.md", "voice.md"];
@@ -35,8 +36,8 @@ function loadVersioned<S extends z.ZodType>(r: Report, file: string, kind: FileK
   try { raw = parse(readFileSync(file, "utf8")); } catch (e) { r.err(file, `invalid YAML: ${(e as Error).message}`); return null; }
   const expected = FILE_VERSIONS[kind];
   if (raw?.version !== expected) {
-    if (typeof raw?.version === "number" && raw.version < expected) r.err(file, `is version ${raw.version}, core v${GTM_VERSION} expects ${expected}: run \`pnpm gtm migrate\``);
-    else if (typeof raw?.version === "number") r.err(file, `is version ${raw.version}, newer than core v${GTM_VERSION} (${expected}): run \`pnpm gtm upgrade\``);
+    if (typeof raw?.version === "number" && raw.version < expected) r.err(file, `is version ${raw.version}, core v${GTM_VERSION} expects ${expected}: run \`npx gtm migrate\``);
+    else if (typeof raw?.version === "number") r.err(file, `is version ${raw.version}, newer than core v${GTM_VERSION} (${expected}): run \`npx gtm upgrade\``);
     else r.err(file, `missing "version: ${expected}"`);
     return null;
   }
@@ -50,19 +51,19 @@ function loadVersioned<S extends z.ZodType>(r: Report, file: string, kind: FileK
 
 function checkCoreSync(r: Report, root: string) {
   const pinned = pinnedVersion(root);
-  if (!pinned) return; // not a client repo (e.g. examples/ in gtm-core)
+  if (!pinned) return; // not a project repo (e.g. examples/ in gtm-core)
   if (!/^\d+\.\d+\.\d+/.test(pinned)) r.err(join(root, "package.json"), `${PACKAGE_NAME} must be pinned exactly (got "${pinned}")`);
   const versionFile = join(root, ".gtm", "VERSION");
   const synced = existsSync(versionFile) ? readFileSync(versionFile, "utf8").trim() : null;
-  if (synced !== GTM_VERSION) r.err(versionFile, `is ${synced ?? "missing"}, installed core is ${GTM_VERSION}: run \`pnpm gtm sync\``);
-  if (!existsSync(join(root, "AGENTS.md"))) r.err(join(root, "AGENTS.md"), "missing: run `pnpm gtm sync`");
+  if (synced !== GTM_VERSION) r.err(versionFile, `is ${synced ?? "missing"}, installed core is ${GTM_VERSION}: run \`npx gtm sync\``);
+  if (!existsSync(join(root, "AGENTS.md"))) r.err(join(root, "AGENTS.md"), "missing: run `npx gtm sync`");
 }
 
 /** Data rule: no lead data in git. Blocks data files, flags real-looking email addresses. */
 function checkNoLeadData(r: Report, root: string) {
   for (const rel of walk(root, SKIP_DIRS)) {
     const file = join(root, rel);
-    if (DATA_FILES.test(rel)) { r.err(file, "data files are not allowed in a client repo (lead data belongs in Postgres)"); continue; }
+    if (DATA_FILES.test(rel)) { r.err(file, "data files are not allowed in a project repo (lead data belongs in Postgres)"); continue; }
     if (!/\.(md|ya?ml|txt)$/i.test(rel) || rel === "pnpm-lock.yaml") continue;
     if (/\.ya?ml$/i.test(rel) && /\bTODO\b/.test(readFileSync(file, "utf8"))) r.warn(file, "still contains TODO placeholders");
     const found = (readFileSync(file, "utf8").match(EMAIL) ?? []).filter((e) => !ALLOWED_EMAIL.test(e));
@@ -86,7 +87,7 @@ function checkPinnedApproval(r: Report, contentFile: string, approval: Approval,
   return false;
 }
 
-function validateCampaign(r: Report, root: string, clientId: string, campaign: string, icp: IcpFile | null, signals: SignalsFile | null, icpApproved: boolean) {
+function validateCampaign(r: Report, root: string, projectId: string, campaign: string, icp: IcpFile | null, signals: SignalsFile | null, icpApproved: boolean) {
   const dir = join(root, "campaigns", campaign);
   console.log(`campaign ${campaign}`);
   for (const f of REQUIRED_CAMPAIGN) if (!existsSync(join(dir, f))) r.err(join(dir, f), "missing");
@@ -94,7 +95,7 @@ function validateCampaign(r: Report, root: string, clientId: string, campaign: s
   const cfgFile = join(dir, "config.yaml");
   const cfg = loadVersioned(r, cfgFile, "campaign-config", CampaignConfig);
   if (cfg) {
-    if (cfg.client_id !== clientId) r.err(cfgFile, `client_id "${cfg.client_id}" does not match client.yaml "${clientId}"`);
+    if (cfg.project_id !== projectId) r.err(cfgFile, `project_id "${cfg.project_id}" does not match project.yaml "${projectId}"`);
     if (cfg.campaign_id !== campaign) r.err(cfgFile, `campaign_id "${cfg.campaign_id}" does not match folder "${campaign}"`);
 
     if (icp) {
@@ -122,7 +123,7 @@ function validateCampaign(r: Report, root: string, clientId: string, campaign: s
     }
     const copyFile = join(dir, "copy.md");
     const copyApproved = existsSync(copyFile)
-      ? checkPinnedApproval(r, copyFile, cfg.gates.copy, copyContentHash(readFileSync(copyFile, "utf8")), "copy", `pnpm gtm approve copy ${campaign}`)
+      ? checkPinnedApproval(r, copyFile, cfg.gates.copy, copyContentHash(readFileSync(copyFile, "utf8")), "copy", `npx gtm approve copy ${campaign}`)
       : false;
     if (stageIndex(cfg.stage) > stageIndex("copy") && !copyApproved) {
       r.err(cfgFile, `stage is "${cfg.stage}" but gates.copy is not approved, or copy.md changed since approval`);
@@ -150,25 +151,26 @@ export function runValidate(root: string, onlyCampaign?: string): boolean {
   const r = new Report(root);
   console.log(`validating ${root} against core v${GTM_VERSION}`);
   checkCoreSync(r, root);
+  for (const { from, to } of pendingRenames(root)) r.err(join(root, from), `renamed to ${to} in core 0.3.0: run \`npx gtm migrate\``);
 
-  const meta = loadVersioned(r, join(root, "client.yaml"), "client", ClientFile);
-  const clientId = meta?.client_id ?? "";
+  const meta = loadVersioned(r, join(root, "project.yaml"), "project", ProjectFile);
+  const projectId = meta?.project_id ?? "";
   if (meta) {
     for (const key of Object.keys(meta.features)) {
-      if (!FEATURES[key]) r.err(join(root, "client.yaml"), `unknown feature "${key}" (known: ${Object.keys(FEATURES).join(", ") || "none"})`);
+      if (!FEATURES[key]) r.err(join(root, "project.yaml"), `unknown feature "${key}" (known: ${Object.keys(FEATURES).join(", ") || "none"})`);
     }
   }
-  if (!existsSync(join(root, "CLIENT.md"))) r.warn(join(root, "CLIENT.md"), "missing (client-specific rules for agents)");
+  if (!existsSync(join(root, "PROJECT.md"))) r.warn(join(root, "PROJECT.md"), "missing (project-specific rules for agents)");
 
   for (const f of REQUIRED_CONTEXT) if (!existsSync(join(root, "context", f))) r.err(join(root, "context", f), "missing");
   const icpFile = join(root, "context", "icp.yaml");
   const sigFile = join(root, "context", "signals.yaml");
   const icp = existsSync(icpFile) ? loadVersioned(r, icpFile, "icp", IcpFile) : null;
   const signals = existsSync(sigFile) ? loadVersioned(r, sigFile, "signals", SignalsFile) : null;
-  if (meta && icp && icp.client_id !== clientId) r.err(icpFile, `client_id "${icp.client_id}" does not match client.yaml "${clientId}"`);
-  if (meta && signals && signals.client_id !== clientId) r.err(sigFile, `client_id "${signals.client_id}" does not match client.yaml "${clientId}"`);
+  if (meta && icp && icp.project_id !== projectId) r.err(icpFile, `project_id "${icp.project_id}" does not match project.yaml "${projectId}"`);
+  if (meta && signals && signals.project_id !== projectId) r.err(sigFile, `project_id "${signals.project_id}" does not match project.yaml "${projectId}"`);
   const icpApproved = icp
-    ? checkPinnedApproval(r, icpFile, icp.approval, icpContentHash(parse(readFileSync(icpFile, "utf8"))), "ICP", "pnpm gtm approve icp")
+    ? checkPinnedApproval(r, icpFile, icp.approval, icpContentHash(parse(readFileSync(icpFile, "utf8"))), "ICP", "npx gtm approve icp")
     : false;
 
   checkNoLeadData(r, root);
@@ -176,7 +178,7 @@ export function runValidate(root: string, onlyCampaign?: string): boolean {
   const campaigns = onlyCampaign ? [onlyCampaign] : subdirs(join(root, "campaigns"));
   for (const c of campaigns) {
     if (!existsSync(join(root, "campaigns", c))) { r.err(join(root, "campaigns", c), "campaign folder not found"); continue; }
-    validateCampaign(r, root, clientId, c, icp, signals, icpApproved);
+    validateCampaign(r, root, projectId, c, icp, signals, icpApproved);
   }
 
   r.summary();

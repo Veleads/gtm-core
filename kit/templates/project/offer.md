@@ -1,4 +1,4 @@
-# Offer: __CLIENT_NAME__
+# Offer: __PROJECT_NAME__
 
 - **Core offer:**
 - **Outbound CTA (low friction):**

@@ -4,20 +4,26 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      # Works with whichever package manager this repo uses (detected from the committed lockfile).
+      - name: Install
+        run: |
+          if [ -f pnpm-lock.yaml ]; then npx -y pnpm@10 install --frozen-lockfile
+          elif [ -f yarn.lock ]; then npx -y yarn@1 install --frozen-lockfile
+          elif [ -f package-lock.json ]; then npm ci
+          else npm install
+          fi
       - name: Core files untouched and in sync
-        run: pnpm exec gtm sync --check
-      - name: Validate client repo
-        run: pnpm exec gtm validate
+        run: npx gtm sync --check
+      - name: Validate project repo
+        run: npx gtm validate

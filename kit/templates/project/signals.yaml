@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=../.gtm/schemas/signals.schema.json
-version: 1
-client_id: __CLIENT_ID__
+version: 2
+project_id: __PROJECT_ID__
 signals:
   - key: signal-one
     description: TODO

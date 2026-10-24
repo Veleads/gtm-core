@@ -12,44 +12,44 @@ export interface CommandHelp {
 
 export const COMMANDS: Record<string, CommandHelp> = {
   init: {
-    usage: 'gtm init <client-slug> --name "<Client Name>" [--dir <path>]',
-    summary: "scaffold a new client repo",
+    usage: 'gtm init <project-slug> --name "<Project Name>" [--dir <path>]',
+    summary: "scaffold a new project repo",
     details: [
-      "Creates a complete client repo: client.yaml, context/ templates, campaigns/, tam/, CLIENT.md,",
+      "Creates a complete project repo: project.yaml, context/ templates, campaigns/, tam/, PROJECT.md,",
       "CI workflows, .gtm/ (core kit) and AGENTS.md, pinned to this CLI's version, then runs git init.",
-      "Push the result to a PRIVATE repo: it will hold client context.",
+      "Push the result to a PRIVATE repo: it will hold project context.",
     ],
-    writes: "A new folder (default ./gtm-client-<slug>). Refuses if it exists and is not empty.",
-    examples: ['npx @veleads/gtm init acme --name "Acme Corp"', 'npx @veleads/gtm init acme --name "Acme Corp" --dir ./clients/acme'],
+    writes: "A new folder (default ./gtm-project-<slug>). Refuses if it exists and is not empty.",
+    examples: ['npx @veleads/gtm init acme --name "Acme Corp"', 'npx @veleads/gtm init acme --name "Acme Corp" --dir ./projects/acme'],
   },
   "new-campaign": {
     usage: "gtm new-campaign <campaign-slug>",
     summary: "scaffold campaigns/<slug>/",
     details: ["Copies the campaign template (brief.md, config.yaml, copy.md, runs/). Owner comes from GTM_USER."],
     writes: "campaigns/<slug>/ (refuses if it exists).",
-    examples: ["git switch -c campaign/q1-uk-cfo && pnpm gtm new-campaign q1-uk-cfo"],
+    examples: ["git switch -c campaign/q1-uk-cfo && npx gtm new-campaign q1-uk-cfo"],
   },
   validate: {
     usage: "gtm validate [campaign]",
     summary: "check repo against schemas, gates, data rules",
     details: [
-      "Checks client.yaml, context/ and campaigns against the schemas; segment/persona/signal references;",
+      "Checks project.yaml, context/ and campaigns against the schemas; segment/persona/signal references;",
       "gate order (no stage past an unapproved or changed ICP/copy approval); required files; run-log names;",
       "no lead data (blocks data files, warns on email addresses); .gtm/ matches the installed core.",
       "Exit code 1 if there is any error; warnings never fail.",
     ],
     writes: "Nothing (read-only).",
-    examples: ["pnpm gtm validate", "pnpm gtm validate q1-uk-cfo"],
+    examples: ["npx gtm validate", "npx gtm validate q1-uk-cfo"],
   },
   status: {
     usage: "gtm status",
     summary: "campaigns, stages, gates",
-    details: ["One screen: client, core version, ICP gate, and per campaign the stage, copy/launch gates, owner and latest run log."],
+    details: ["One screen: project, core version, ICP gate, and per campaign the stage, copy/launch gates, owner and latest run log."],
     writes: "Nothing (read-only).",
-    examples: ["pnpm gtm status"],
+    examples: ["npx gtm status"],
   },
   approve: {
-    usage: 'gtm approve icp --by "<Name (side)>" [--notes ".."] [--date YYYY-MM-DD]\ngtm approve copy <campaign> --by "<Name (side)>" [--notes ".."] [--date YYYY-MM-DD]',
+    usage: 'gtm approve icp --by "<Name (role)>" [--notes ".."] [--date YYYY-MM-DD]\ngtm approve copy <campaign> --by "<Name (role)>" [--notes ".."] [--date YYYY-MM-DD]',
     summary: "record a sign-off and pin a hash of the approved content",
     details: [
       "Run ONLY after the named human explicitly approved in this session (AGENTS.md section 4).",
@@ -58,7 +58,7 @@ export const COMMANDS: Record<string, CommandHelp> = {
       "The launch gate is recorded by hand in config.yaml (its content is the lead set).",
     ],
     writes: "context/icp.yaml → approval (icp), or campaigns/<campaign>/config.yaml → gates.copy (copy).",
-    examples: ['pnpm gtm approve icp --by "Maria Chen (client)" --notes "Segments A+B, personas CFO+AP"', 'pnpm gtm approve copy q1-uk-cfo --by "Maria Chen (client)"'],
+    examples: ['npx gtm approve icp --by "Maria Chen (VP Marketing)" --notes "Segments A+B, personas CFO+AP"', 'npx gtm approve copy q1-uk-cfo --by "Maria Chen (VP Marketing)"'],
   },
   sync: {
     usage: "gtm sync [--check]",
@@ -68,14 +68,14 @@ export const COMMANDS: Record<string, CommandHelp> = {
       "--check only compares and exits 1 if they differ (CI uses this; never edit .gtm/ by hand).",
     ],
     writes: ".gtm/ (replaced entirely) and AGENTS.md; creates CLAUDE.md if missing. With --check: nothing.",
-    examples: ["pnpm gtm sync", "pnpm gtm sync --check"],
+    examples: ["npx gtm sync", "npx gtm sync --check"],
   },
   migrate: {
     usage: "gtm migrate [--dry-run]",
     summary: "upgrade YAML files to current schema versions",
-    details: ["Applies core schema migrations to client.yaml, context/*.yaml and campaigns/*/config.yaml, keeping comments."],
+    details: ["Applies core schema migrations to project.yaml, context/*.yaml and campaigns/*/config.yaml, keeping comments."],
     writes: "Those YAML files, only if a migration applies. With --dry-run: nothing.",
-    examples: ["pnpm gtm migrate --dry-run", "pnpm gtm migrate"],
+    examples: ["npx gtm migrate --dry-run", "npx gtm migrate"],
   },
   upgrade: {
     usage: "gtm upgrade [version] [--force]",
@@ -85,7 +85,7 @@ export const COMMANDS: Record<string, CommandHelp> = {
       "Refuses while a campaign is in qa or launch, or with uncommitted changes (--force overrides; ask a GTM engineer).",
     ],
     writes: "package.json, lockfile, node_modules, .gtm/, AGENTS.md and migrated YAML files.",
-    examples: ["pnpm gtm upgrade", "pnpm gtm upgrade 0.3.0"],
+    examples: ["npx gtm upgrade", "npx gtm upgrade 0.3.0"],
   },
   job: {
     usage: "gtm job <name> <campaign>",
@@ -95,16 +95,16 @@ export const COMMANDS: Record<string, CommandHelp> = {
       "Not available yet: it exits 1. Per AGENTS.md this is a stop; do not improvise jobs with ad-hoc scripts.",
     ],
     writes: "Nothing yet.",
-    examples: ["pnpm gtm job tam q1-uk-cfo"],
+    examples: ["npx gtm job tam q1-uk-cfo"],
   },
 };
 
 export function generalHelp(version: string): string {
   const width = Math.max(...Object.keys(COMMANDS).map((c) => c.length));
   const lines = Object.entries(COMMANDS).map(([name, c]) => `  ${name.padEnd(width)}  ${c.summary}`);
-  return `gtm v${version}: CLI for gtm-brain client repos (@veleads/gtm)
+  return `gtm v${version}: CLI for gtm-brain project repos (@veleads/gtm)
 
-Usage: gtm <command> [options]      (inside a client repo: pnpm gtm <command>)
+Usage: gtm <command> [options]      (inside a project repo: npx gtm <command>)
 
 Commands:
 ${lines.join("\n")}
@@ -118,7 +118,7 @@ Global options:
 
 Exit codes: 0 success, 1 failure or validation errors.
 
-For coding agents: inside a client repo, read AGENTS.md first and follow it. Read-only commands
+For coding agents: inside a project repo, read AGENTS.md first and follow it. Read-only commands
 (validate, status, sync --check, migrate --dry-run) are always safe to run.`;
 }
 

@@ -3,7 +3,7 @@ import { Domain, IsoDateTime, Slug } from "./common.ts";
 
 /** One observed signal event (stage 4 input). `signal_key` must exist in signals.yaml. */
 export const SignalEvent = z.object({
-  client_id: Slug,
+  project_id: Slug,
   signal_key: Slug,
   account_domain: Domain,
   contact_linkedin_url: z.string().url().nullable(),

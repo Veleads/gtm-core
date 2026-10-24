@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=.gtm/schemas/project.schema.json
+version: 2
+project_id: __PROJECT_ID__
+name: __PROJECT_NAME__
+status: onboarding
+started_at: __TODAY__
+owners:
+  gtm_engineer: TODO
+  sdrs: []
+  approver: TODO # person who signs off ICP and copy for this project
+regions: [TODO]
+features: {} # opt-in core features (see .gtm/ CHANGELOG / FEATURES)

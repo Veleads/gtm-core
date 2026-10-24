@@ -1,5 +1,5 @@
 {
-  "id": "98dd022a-eea0-475f-a227-5ba23468dd97",
+  "id": "7c9311f0-5965-488d-8332-fdfa6c2a04b3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -15,8 +15,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "client_id": {
-          "name": "client_id",
+        "project_id": {
+          "name": "project_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -123,11 +123,11 @@
         }
       },
       "indexes": {
-        "accounts_client_tam_domain_uq": {
-          "name": "accounts_client_tam_domain_uq",
+        "accounts_project_tam_domain_uq": {
+          "name": "accounts_project_tam_domain_uq",
           "columns": [
             {
-              "expression": "client_id",
+              "expression": "project_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -169,8 +169,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "client_id": {
-          "name": "client_id",
+        "project_id": {
+          "name": "project_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -291,7 +291,7 @@
           "name": "campaign_leads_campaign_contact_uq",
           "columns": [
             {
-              "expression": "client_id",
+              "expression": "project_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -318,7 +318,7 @@
           "name": "campaign_leads_status_idx",
           "columns": [
             {
-              "expression": "client_id",
+              "expression": "project_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -387,8 +387,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "client_id": {
-          "name": "client_id",
+        "project_id": {
+          "name": "project_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -502,11 +502,11 @@
         }
       },
       "indexes": {
-        "contacts_client_linkedin_uq": {
-          "name": "contacts_client_linkedin_uq",
+        "contacts_project_linkedin_uq": {
+          "name": "contacts_project_linkedin_uq",
           "columns": [
             {
-              "expression": "client_id",
+              "expression": "project_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -523,11 +523,11 @@
           "method": "btree",
           "with": {}
         },
-        "contacts_client_email_idx": {
-          "name": "contacts_client_email_idx",
+        "contacts_project_email_idx": {
+          "name": "contacts_project_email_idx",
           "columns": [
             {
-              "expression": "client_id",
+              "expression": "project_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -577,8 +577,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "client_id": {
-          "name": "client_id",
+        "project_id": {
+          "name": "project_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -648,11 +648,11 @@
         }
       },
       "indexes": {
-        "costs_client_campaign_idx": {
-          "name": "costs_client_campaign_idx",
+        "costs_project_campaign_idx": {
+          "name": "costs_project_campaign_idx",
           "columns": [
             {
-              "expression": "client_id",
+              "expression": "project_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -688,8 +688,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "client_id": {
-          "name": "client_id",
+        "project_id": {
+          "name": "project_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -768,7 +768,7 @@
           "name": "enrichments_cache_uq",
           "columns": [
             {
-              "expression": "client_id",
+              "expression": "project_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -816,8 +816,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "client_id": {
-          "name": "client_id",
+        "project_id": {
+          "name": "project_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -891,7 +891,7 @@
           "name": "outreach_events_external_uq",
           "columns": [
             {
-              "expression": "client_id",
+              "expression": "project_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -947,8 +947,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "client_id": {
-          "name": "client_id",
+        "project_id": {
+          "name": "project_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -1039,11 +1039,11 @@
         }
       },
       "indexes": {
-        "runs_client_campaign_idx": {
-          "name": "runs_client_campaign_idx",
+        "runs_project_campaign_idx": {
+          "name": "runs_project_campaign_idx",
           "columns": [
             {
-              "expression": "client_id",
+              "expression": "project_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1079,8 +1079,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "client_id": {
-          "name": "client_id",
+        "project_id": {
+          "name": "project_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -1155,11 +1155,11 @@
         }
       },
       "indexes": {
-        "signals_client_account_idx": {
-          "name": "signals_client_account_idx",
+        "signals_project_account_idx": {
+          "name": "signals_project_account_idx",
           "columns": [
             {
-              "expression": "client_id",
+              "expression": "project_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1228,8 +1228,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "client_id": {
-          "name": "client_id",
+        "project_id": {
+          "name": "project_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -1299,11 +1299,11 @@
         }
       },
       "indexes": {
-        "suppression_client_domain_idx": {
-          "name": "suppression_client_domain_idx",
+        "suppression_project_domain_idx": {
+          "name": "suppression_project_domain_idx",
           "columns": [
             {
-              "expression": "client_id",
+              "expression": "project_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1320,11 +1320,11 @@
           "method": "btree",
           "with": {}
         },
-        "suppression_client_email_idx": {
-          "name": "suppression_client_email_idx",
+        "suppression_project_email_idx": {
+          "name": "suppression_project_email_idx",
           "columns": [
             {
-              "expression": "client_id",
+              "expression": "project_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"

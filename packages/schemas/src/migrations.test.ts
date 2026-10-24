@@ -34,3 +34,27 @@ test("refuses files newer than core", () => {
 test("fails loudly on a gap in the chain", () => {
   assert.throws(() => migrateDocument("icp", parseDocument("version: 1\n"), fake, 2), /no migration from version 1/);
 });
+
+test("0.3.0: client → project migrations rename keys in place and keep comments", () => {
+  const doc = parseDocument(`version: 1
+client_id: acme # slug
+name: Acme
+status: churned
+owners:
+  gtm_engineer: alex
+  client_approver: Maria # signs off
+regions: [UK]
+`);
+  migrateDocument("project", doc);
+  const out = doc.toString();
+  assert.match(out, /^version: 2\nproject_id: acme # slug\nname: Acme/);
+  assert.match(out, /  approver: Maria # signs off/);
+  assert.match(out, /status: closed/);
+  assert.doesNotMatch(out, /client/);
+
+  for (const kind of ["icp", "signals", "campaign-config"] as const) {
+    const d = parseDocument("version: 1\nclient_id: acme\nother: 1\n");
+    migrateDocument(kind, d);
+    assert.equal(d.toString(), "version: 2\nproject_id: acme\nother: 1\n");
+  }
+});

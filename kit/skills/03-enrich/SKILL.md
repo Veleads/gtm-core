@@ -24,7 +24,7 @@ Turn active accounts into contacts with verified emails at the lowest cost, with
    why in the run log.
 3. Run a **pilot** first on a small slice (about 50 accounts) and read the counts: find rate,
    verified rate per provider, cost per verified email.
-4. If the pilot looks sane, run the full job: `pnpm gtm job enrich <campaign>`. The job
+4. If the pilot looks sane, run the full job: `npx gtm job enrich <campaign>`. The job
    handles iteration, caching (`enrichments` table), and stops at the budget cap (`budget_stopped`).
 5. Record per-provider counts: attempts, found, verified, cost. Record overall coverage:
    contacts found / accounts, verified emails / contacts.

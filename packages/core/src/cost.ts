@@ -21,7 +21,7 @@ export interface CostEntry extends CallCost {
 export interface CostSink {
   record(ctx: RunContext, entry: CostEntry): Promise<void>;
   /** Spend already recorded for this campaign by earlier runs. */
-  spentForCampaign(clientId: string, campaignId: string): Promise<number>;
+  spentForCampaign(projectId: string, campaignId: string): Promise<number>;
 }
 
 /**
@@ -41,7 +41,7 @@ export class CostTracker {
   }
 
   static async forCampaign(ctx: RunContext, capUsd: number, sink: CostSink): Promise<CostTracker> {
-    const spent = ctx.campaignId ? await sink.spentForCampaign(ctx.clientId, ctx.campaignId) : 0;
+    const spent = ctx.campaignId ? await sink.spentForCampaign(ctx.projectId, ctx.campaignId) : 0;
     return new CostTracker(ctx, capUsd, sink, spent);
   }
 

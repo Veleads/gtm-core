@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# This repo is public. Fail if tracked/untracked files look like they contain client or prospect data.
+# This repo is public. Fail if tracked/untracked files look like they contain project or prospect data.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

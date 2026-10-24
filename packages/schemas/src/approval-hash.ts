@@ -12,7 +12,7 @@ export function stableStringify(value: unknown): string {
 }
 
 /**
- * Fingerprint of what the client approves in icp.yaml: everything except `approval` and `version`.
+ * Fingerprint of what the approver signs off in icp.yaml: everything except `approval` and `version`.
  * Takes the parsed YAML, so comments, formatting and key order don't change it; any edit to
  * segments, personas or exclusions does.
  */

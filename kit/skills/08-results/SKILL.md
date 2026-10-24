@@ -12,7 +12,7 @@ Know what is working by segment × variant, protect deliverability, and feed lea
 - `config.yaml` → `sending.sender_campaign_ref`; `brief.md` success metrics
 
 ## Steps
-1. `pnpm gtm job results <campaign>`: pulls events since the last pull into `outreach_events`,
+1. `npx gtm job results <campaign>`: pulls events since the last pull into `outreach_events`,
    updates lead statuses, adds bounces/unsubscribes to suppression, prints aggregates by
    segment × variant × step.
 2. Health check first: bounce rate > 3% or any spam complaints → mandatory stop; recommend pausing
@@ -22,7 +22,7 @@ Know what is working by segment × variant, protect deliverability, and feed lea
 4. Write the run log (counts only). Weekly: `reports/<YYYY-Www>.md` from `.gtm/templates/outputs/weekly-report.md`.
 5. Compare against brief metrics. Recommend changes (variant to pause, segment to expand), but
    copy changes go back through `05-copy` and its gate, and targeting changes through `01-icp`/`04-qualify`.
-6. Learnings that apply beyond this client → "Learnings → PRs" in the run log, then a
+6. Learnings that apply beyond this project → "Learnings → PRs" in the run log, then a
    PR to Veleads/gtm-core editing the relevant skill (never edit `.gtm/` here).
 
 ## Outputs
@@ -36,7 +36,7 @@ Run log per pull; weekly report; suppression updated (DB).
 
 ## Gate
 None (recurring). The campaign ends when the brief's timeframe ends or the human stops it. Write a
-final report and set `client.yaml` status if the engagement ends.
+final report and set `project.yaml` status if the engagement ends.
 
 ## Next
-Next campaign: `pnpm gtm new-campaign <slug>` → routing table.
+Next campaign: `npx gtm new-campaign <slug>` → routing table.

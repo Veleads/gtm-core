@@ -2,7 +2,7 @@
 
 > Append-only. One file per run per user: runs/<YYYY-MM-DD>-<user>[-n].md. No PII.
 
-- **Client / campaign:**
+- **Project / campaign:**
 - **Branch / commit:**
 - **Agent:** (Claude Code / Codex / other)
 - **Stage(s) worked:**

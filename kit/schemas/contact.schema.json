@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
-    "client_id": {
+    "project_id": {
       "type": "string",
       "pattern": "^[a-z0-9][a-z0-9-]*$"
     },
@@ -91,7 +91,7 @@
     }
   },
   "required": [
-    "client_id",
+    "project_id",
     "account_domain",
     "first_name",
     "last_name",

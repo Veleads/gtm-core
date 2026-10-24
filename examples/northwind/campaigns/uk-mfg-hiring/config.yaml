@@ -1,5 +1,5 @@
-version: 1
-client_id: northwind
+version: 2
+project_id: northwind
 campaign_id: uk-mfg-hiring
 owner: jdoe
 stage: copy # current stage; see AGENTS.md routing table
@@ -45,7 +45,7 @@ sending:
 compliance:
   regions: [UK]
   lawful_basis: legitimate_interest
-  lia_ref: "Client drive: Legal/LIA-outbound-2026-09-10.pdf"
+  lia_ref: "Northwind drive: Legal/LIA-outbound-2026-09-10.pdf"
   opt_out_text: "Not relevant? Reply 'no thanks' and I won't contact you again."
   privacy_notice_url: https://northwind-ledger.example/privacy
 

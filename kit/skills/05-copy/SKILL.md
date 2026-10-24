@@ -1,13 +1,13 @@
 ---
 name: 05-copy
-description: Stage 5 of the gtm-brain process. Writes the email sequence and personalization per segment × persona and signal angle in copy.md, grounded in personas, offer, approved proof and voice. Ends at a hard stop for client copy sign-off.
+description: Stage 5 of the gtm-brain process. Writes the email sequence and personalization per segment × persona and signal angle in copy.md, grounded in personas, offer, approved proof and voice. Ends at a hard stop for copy sign-off by the project approver.
 ---
 
 # 05 · Copy
 
 ## Purpose
 Write messages the target persona would actually reply to, using only facts
-the client approved.
+the approver signed off.
 
 ## Inputs
 - `context/personas.md`, `offer.md`, `proof.md` (only "approved for outbound: yes"), `voice.md`
@@ -27,9 +27,9 @@ the client approved.
    a variable.
 5. Self-review against the checklist below, then render each step once with a fictional example
    lead (fictional name and company) for the human.
-6. **HARD STOP.** Present all variants for client sign-off. Edits requested → change, re-present,
+6. **HARD STOP.** Present all variants for sign-off. Edits requested → change, re-present,
    still pending. Only after explicit approval from the named approver, record it:
-   `pnpm gtm approve copy <campaign> --by "<Name (client)>" --notes "<what was approved>"`. Quote the
+   `npx gtm approve copy <campaign> --by "<Name (role)>" --notes "<what was approved>"`. Quote the
    approval in the run log and commit `copy.md`, `config.yaml` and the run log together.
 
 ## Outputs
@@ -45,8 +45,8 @@ the client approved.
 - [ ] Plain-text friendly; at most one link, none in step 1 preferred
 
 ## Gate
-**Client copy sign-off (hard stop).** Recorded with `pnpm gtm approve copy <campaign>`, which pins a
-hash of `copy.md`. Any later change to the copy makes `pnpm gtm validate` fail and blocks the campaign
+**Copy sign-off (hard stop).** Recorded with `npx gtm approve copy <campaign>`, which pins a
+hash of `copy.md`. Any later change to the copy makes `npx gtm validate` fail and blocks the campaign
 past `copy` until it is re-approved (or the change is reverted). Note lines starting with `>` (status,
 available variables) and whitespace-only changes do not count.
 

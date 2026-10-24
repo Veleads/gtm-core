@@ -1,4 +1,4 @@
-# ICP: __CLIENT_NAME__
+# ICP: __PROJECT_NAME__
 
 > Human-readable rationale. The machine-readable version is `icp.yaml`. Keep them in sync.
 

@@ -1,9 +1,9 @@
-# CLIENT.md: Northwind Ledger (fictional example)
+# PROJECT.md: Northwind Ledger (fictional example)
 
-Client-specific rules. Read after AGENTS.md. These add to stages; they never remove steps or gates.
+Project-specific rules. Read after AGENTS.md. These add to stages; they never remove steps or gates.
 
 ## Standing constraints
-- UK + EU only. No US until the client's legal team signs off.
+- UK + EU only. No US until Northwind's legal team signs off.
 - Never name a customer in copy unless proof.md marks it "approved for outbound: yes".
 - Exclude holding companies (see 2026-10-23 run log learning).
 
@@ -12,4 +12,4 @@ Client-specific rules. Read after AGENTS.md. These add to stages; they never rem
 - 05-copy: British English; maximum two variants per segment × persona.
 
 ## Contacts
-- Client approver: Maria Chen (VP Marketing). Agency owner: alex.
+- Project approver: Maria Chen (VP Marketing). Agency owner: alex.

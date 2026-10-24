@@ -6,7 +6,7 @@ export type EmailStatus = z.infer<typeof EmailStatus>;
 
 /** Normalized contact (stage 3). */
 export const Contact = z.object({
-  client_id: Slug,
+  project_id: Slug,
   account_domain: Domain,
   first_name: z.string().min(1),
   last_name: z.string().min(1),

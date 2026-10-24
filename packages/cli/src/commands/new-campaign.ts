@@ -8,13 +8,13 @@ import { copyTemplate } from "../template.ts";
 
 export function runNewCampaign(root: string, campaign: string | undefined): boolean {
   if (!campaign || !Slug.safeParse(campaign).success) { console.error("Usage: gtm new-campaign <campaign-slug>"); return false; }
-  const clientFile = join(root, "client.yaml");
-  if (!existsSync(clientFile)) { console.error("client.yaml not found: run this from the root of a client repo"); return false; }
+  const projectFile = join(root, "project.yaml");
+  if (!existsSync(projectFile)) { console.error("project.yaml not found: run this from the root of a project repo"); return false; }
   const dest = join(root, "campaigns", campaign);
   if (existsSync(dest)) { console.error(`campaigns/${campaign} already exists`); return false; }
 
-  const clientId = parse(readFileSync(clientFile, "utf8"))?.client_id ?? "TODO";
-  copyTemplate(join(KIT_DIR, "templates", "campaign"), dest, { CLIENT_ID: clientId, CAMPAIGN_ID: campaign, OWNER: process.env.GTM_USER ?? "TODO" });
+  const projectId = parse(readFileSync(projectFile, "utf8"))?.project_id ?? "TODO";
+  copyTemplate(join(KIT_DIR, "templates", "campaign"), dest, { PROJECT_ID: projectId, CAMPAIGN_ID: campaign, OWNER: process.env.GTM_USER ?? "TODO" });
   mkdirSync(join(dest, "runs"), { recursive: true });
   writeFileSync(join(dest, "runs", ".gitkeep"), "");
   console.log(`Created campaigns/${campaign}. Branch: git switch -c campaign/${campaign}`);

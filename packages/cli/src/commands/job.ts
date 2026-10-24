@@ -1,7 +1,7 @@
 // gtm job <name> <campaign>: Phase 2. Planned flow (see workers/README.md in gtm-core):
 //   1. validate the campaign, 2. resolve config + context into one payload,
-//   3. trigger the Hatchet workflow with { payload, client repo commit, core version },
-//   4. wait and print run_id, counts and cost. Workers never read client repos.
+//   3. trigger the Hatchet workflow with { payload, project repo commit, core version },
+//   4. wait and print run_id, counts and cost. Workers never read project repos.
 const JOBS = ["tam", "enrich", "suppression:import", "signals", "qualify", "qa", "push", "activate", "results", "status"];
 
 export function runJob(name: string | undefined): boolean {

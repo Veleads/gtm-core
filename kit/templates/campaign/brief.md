@@ -1,6 +1,6 @@
 # Campaign brief: __CAMPAIGN_ID__
 
-- **Client:** __CLIENT_ID__
+- **Project:** __PROJECT_ID__
 - **Campaign id:** __CAMPAIGN_ID__
 - **Branch:** `campaign/__CAMPAIGN_ID__`
 - **Owner:** __OWNER__

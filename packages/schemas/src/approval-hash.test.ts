@@ -4,7 +4,7 @@ import { parse } from "yaml";
 import { copyContentHash, icpContentHash } from "./approval-hash.ts";
 
 const base = `version: 1
-client_id: acme
+project_id: acme
 approval: {status: pending, approved_by: null, approved_at: null}
 segments:
   - id: seg-a
@@ -16,8 +16,8 @@ personas:
 const hash = (text: string) => icpContentHash(parse(text));
 
 test("comments, formatting and key order do not change the hash", () => {
-  const reformatted = `# reviewed with client
-client_id: acme   # the slug
+  const reformatted = `# reviewed with the approver
+project_id: acme   # the slug
 version: 1
 personas:
   - id: cfo
@@ -54,7 +54,7 @@ test("format is sha256 with 16 hex chars", () => {
 
 const copy = `# Copy: q1
 
-> Status: **awaiting client sign-off**
+> Status: **awaiting sign-off**
 > Variables: {{first_name}}
 
 ## Variant A
@@ -66,7 +66,7 @@ We moved close from day 9 to day 4.
 `;
 
 test("copy: note lines, line endings, trailing spaces and blank-line runs do not count", () => {
-  const touched = copy.replace("awaiting client sign-off", "approved by Maria")
+  const touched = copy.replace("awaiting sign-off", "approved by Maria")
     .replace("> Variables: {{first_name}}", "> Variables: {{first_name}}, {{company_name}}")
     .replace(/\n/g, "\r\n").replace("Hi {{first_name}},", "Hi {{first_name}},   ") + "\n\n\n";
   assert.equal(copyContentHash(touched), copyContentHash(copy));

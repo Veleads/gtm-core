@@ -1,10 +1,10 @@
 # yaml-language-server: $schema=../../.gtm/schemas/campaign-config.schema.json
-version: 1
-client_id: __CLIENT_ID__
+version: 2
+project_id: __PROJECT_ID__
 campaign_id: __CAMPAIGN_ID__
 owner: __OWNER__
 stage: icp
-tam_id: __CLIENT_ID__-tam-TODO
+tam_id: __PROJECT_ID__-tam-TODO
 segments: [segment-one]
 personas: [persona-one]
 

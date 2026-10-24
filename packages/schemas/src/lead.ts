@@ -7,7 +7,7 @@ import { Domain, FieldSources, Slug, Tier } from "./common.ts";
  * a tier allowed to send, a passed suppression check and a recorded source per field.
  */
 export const Lead = z.object({
-  client_id: Slug,
+  project_id: Slug,
   campaign_id: Slug,
   run_id: z.uuid(),
   email: z.email(),

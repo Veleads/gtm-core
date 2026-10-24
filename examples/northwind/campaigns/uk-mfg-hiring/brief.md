@@ -2,7 +2,7 @@
 
 > Fictional example. Filled from `templates/campaign/brief.md`.
 
-- **Client:** northwind (Northwind Ledger)
+- **Project:** northwind (Northwind Ledger)
 - **Campaign id:** uk-mfg-hiring
 - **Branch:** `campaign/uk-mfg-hiring`
 - **Owner:** jdoe
