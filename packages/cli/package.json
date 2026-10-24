@@ -38,11 +38,13 @@
   },
   "dependencies": {
     "yaml": "^2.8.1",
-    "zod": "^4.1.0"
+    "zod": "^4.1.0",
+    "@hatchet-dev/typescript-sdk": "1.43.0"
   },
   "devDependencies": {
     "@gtm/schemas": "workspace:*",
-    "tsup": "^8.5.0"
+    "tsup": "^8.5.0",
+    "@gtm/core": "workspace:*"
   },
   "homepage": "https://github.com/Veleads/gtm-core#readme",
   "bugs": {

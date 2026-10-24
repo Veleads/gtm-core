@@ -1,9 +1,12 @@
-# Local dev only: Postgres (data layer) + hatchet-lite (job runner).
-#   docker compose up -d     then   pnpm db:migrate
-# Hatchet UI: http://localhost:8888 (create an API token there and put it in .env)
+# Local stack: Postgres (gtm data + Hatchet's own database) and hatchet-lite (job engine).
+#   pnpm stack:up     start, migrate the gtm database, create a Hatchet token → ~/.gtm/stack.env
+#   pnpm worker       run the gtm worker on this machine (connects to the stack)
+#   pnpm stack:down   stop (data kept)   ·   pnpm stack:down --wipe   stop and delete all data
+# Hatchet UI: http://localhost:8888 (local default login admin@example.com / Admin123!!; local only).
 services:
   postgres:
-    image: postgres:16
+    image: postgres:16.10
+    command: postgres -c max_connections=200
     environment:
       POSTGRES_USER: gtm
       POSTGRES_PASSWORD: gtm
@@ -14,13 +17,12 @@ services:
       - ./db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U gtm -d gtm"]
-      interval: 5s
+      interval: 2s
       timeout: 5s
-      retries: 10
+      retries: 30
 
   hatchet-lite:
-    # Pin to a specific tag before relying on this in shared environments.
-    image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:latest
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:v0.110.5
     depends_on:
       postgres:
         condition: service_healthy
@@ -35,7 +37,6 @@ services:
       SERVER_GRPC_PORT: "7077"
       SERVER_URL: http://localhost:8888
       SERVER_AUTH_SET_EMAIL_VERIFIED: "t"
-      SERVER_DEFAULT_ENGINE_VERSION: V1
       SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: localhost:7077
     volumes:
       - hatchet_config:/config

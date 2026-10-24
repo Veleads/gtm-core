@@ -19,7 +19,12 @@
     "test:e2e": "bash scripts/e2e.sh",
     "validate:examples": "pnpm gtm validate --root examples/northwind",
     "check": "pnpm typecheck && pnpm test && pnpm validate:examples && pnpm guard:public",
-    "guard:public": "bash scripts/public-guard.sh"
+    "guard:public": "bash scripts/public-guard.sh",
+    "worker": "pnpm --filter @gtm/workers start",
+    "stack:up": "tsx scripts/stack.ts up",
+    "stack:down": "tsx scripts/stack.ts down",
+    "stack:status": "tsx scripts/stack.ts status",
+    "test:stack": "bash scripts/e2e-stack.sh"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

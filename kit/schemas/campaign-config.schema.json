@@ -37,6 +37,26 @@
       "type": "string",
       "pattern": "^[a-z0-9][a-z0-9-]*$"
     },
+    "tam": {
+      "description": "How `gtm job tam` builds the TAM",
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "description": "Account source adapter (mock-accounts for local proofs; real providers in .gtm/providers/)"
+        },
+        "max_accounts_per_segment": {
+          "default": 500,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 100000
+        }
+      },
+      "required": [
+        "source"
+      ]
+    },
     "segments": {
       "minItems": 1,
       "type": "array",

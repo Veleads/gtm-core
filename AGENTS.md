@@ -67,6 +67,9 @@ pnpm check            # typecheck + unit tests + kit schema freshness + validate
 pnpm gtm <command>    # run the CLI from source, e.g. pnpm gtm validate --root examples/northwind
 pnpm build            # bundle @veleads/gtm (dist/ + kit/ + CHANGELOG.md)
 pnpm test:e2e         # pack the CLI, init a throwaway project repo, install, sync, validate
+pnpm stack:up         # local Postgres + hatchet-lite + migrations + token (~/.gtm/stack.env)
+pnpm worker           # run the workers locally
+pnpm test:stack       # gtm job tam end to end against the local stack (needs Docker)
 ```
 
 - Branches `feat/…`, `fix/…`, `playbook/…`; PR to `main`; CODEOWNERS review. External PRs welcome (CONTRIBUTING.md).

@@ -4,6 +4,11 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+- **opt-in** `gtm job tam <campaign>` is available: builds the TAM through the workers (Hatchet) into
+  Postgres and prints the funnel (TAM → reachable → active), cost, run_id and a run-log row. Needs an
+  approved ICP and `config.yaml` → `tam: { source, max_accounts_per_segment }`; `mock-accounts`
+  generates fictional accounts to prove the pipeline locally. Re-runs update instead of duplicating;
+  suppression lowers "active". Local stack: `pnpm stack:up` + `pnpm worker` in gtm-core.
 
 ## [0.5.0] - 2026-10-24
 - **action** Research-first intake: new `research` skill writes `context/research.md` (sourced facts,

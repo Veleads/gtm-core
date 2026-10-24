@@ -63,7 +63,7 @@ async function run(): Promise<boolean> {
     case "sync": return runSync(root, { check: values.check });
     case "migrate": return runMigrate(root, { dryRun: values["dry-run"] });
     case "upgrade": return runUpgrade(root, { version: args[0], force: values.force });
-    case "job": return runJob(args[0]);
+    case "job": return runJob(root, args);
     case undefined: return help(undefined);
     case "help": return help(args[0]);
     default: console.error(`Unknown command "${command}"\n\n${generalHelp(GTM_VERSION)}`); return false;

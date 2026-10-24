@@ -173,7 +173,7 @@ Run from the repo root. If you cannot run shell commands, give the exact command
 | `npx gtm sync [--check]` | re-copy core kit into `.gtm/` and `AGENTS.md` | available |
 | `npx gtm migrate [--dry-run]` | rewrite YAML files to the installed core's schema versions | available |
 | `npx gtm upgrade [version]` | install a newer core, sync, migrate, validate, show changelog | available |
-| `npx gtm job tam <campaign>` | build TAM into `accounts`, print funnel counts | planned |
+| `npx gtm job tam <campaign>` | build TAM into `accounts` (via the workers), print funnel counts, cost, run_id and a run-log row | available |
 | `npx gtm job enrich <campaign>` | find people + email waterfall + verification, cost-capped | planned |
 | `npx gtm job suppression:import <campaign> <file>` | load suppression lists (file stays outside git) | planned |
 | `npx gtm job signals <campaign>` | fetch configured signals for active accounts | planned |
