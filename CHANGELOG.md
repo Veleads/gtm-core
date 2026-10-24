@@ -4,6 +4,8 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+
+## [0.6.0] - 2026-10-24
 - **no action** Layered ICP: `context/icp.yaml` can have an optional `core.firmographics` that every
   segment shares; segments then hold only what differs, and a segment field **replaces** the same core
   field (lists are not combined). Segments may restrict `personas`. Existing ICPs are unchanged and
