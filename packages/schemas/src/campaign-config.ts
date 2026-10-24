@@ -62,7 +62,7 @@ const Compliance = z.object({
 export const CampaignConfig = z
   .object({
     version: z.literal(FILE_VERSIONS["campaign-config"]),
-    client_id: Slug,
+    project_id: Slug,
     campaign_id: Slug,
     owner: z.string().min(1),
     stage: Stage.describe("The stage currently being worked on"),

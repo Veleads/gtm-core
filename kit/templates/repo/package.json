@@ -1,5 +1,5 @@
 {
-  "name": "gtm-client-__CLIENT_ID__",
+  "name": "gtm-project-__PROJECT_ID__",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.34.7",

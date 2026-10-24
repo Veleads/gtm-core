@@ -7,7 +7,7 @@ import { BudgetExceededError, CostTracker, type CostEntry, type CostSink } from 
 import type { RunContext } from "./types.ts";
 import { runEmailWaterfall } from "./waterfall.ts";
 
-const ctx: RunContext = { clientId: "_example", campaignId: "_example", runId: "00000000-0000-4000-8000-000000000000", triggeredBy: "test" };
+const ctx: RunContext = { projectId: "_example", campaignId: "_example", runId: "00000000-0000-4000-8000-000000000000", triggeredBy: "test" };
 const input = { firstName: "Ada", lastName: "Lovelace", domain: "example.com", linkedinUrl: null };
 
 function memoryCache(): EnrichmentCache {

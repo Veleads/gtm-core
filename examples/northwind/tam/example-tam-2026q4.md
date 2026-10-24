@@ -17,4 +17,4 @@
 - Expected range from intake: 2k–5k accounts. **Within range.**
 - Spot check: 20 random accounts reviewed; 18 clearly ICP, 2 holding companies, so `keywords_none: [holding company]` was added.
 - Suppressed: 141 customers/open deals, 3 competitors, 14 do-not-contact domains.
-- Decision: proceed with uk-manufacturing-mm first (client request).
+- Decision: proceed with uk-manufacturing-mm first (Northwind request).

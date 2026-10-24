@@ -7,7 +7,7 @@ CREATE TYPE "public"."suppression_kind" AS ENUM('customers', 'open_deals', 'comp
 CREATE TYPE "public"."tier" AS ENUM('A', 'B', 'C');--> statement-breakpoint
 CREATE TABLE "accounts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"client_id" text NOT NULL,
+	"project_id" text NOT NULL,
 	"campaign_id" text,
 	"run_id" uuid NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE "accounts" (
 --> statement-breakpoint
 CREATE TABLE "campaign_leads" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"client_id" text NOT NULL,
+	"project_id" text NOT NULL,
 	"campaign_id" text NOT NULL,
 	"run_id" uuid NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE "campaign_leads" (
 --> statement-breakpoint
 CREATE TABLE "contacts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"client_id" text NOT NULL,
+	"project_id" text NOT NULL,
 	"campaign_id" text,
 	"run_id" uuid NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -72,7 +72,7 @@ CREATE TABLE "contacts" (
 --> statement-breakpoint
 CREATE TABLE "costs" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"client_id" text NOT NULL,
+	"project_id" text NOT NULL,
 	"campaign_id" text,
 	"run_id" uuid NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE "costs" (
 --> statement-breakpoint
 CREATE TABLE "enrichments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"client_id" text NOT NULL,
+	"project_id" text NOT NULL,
 	"campaign_id" text,
 	"run_id" uuid NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE "enrichments" (
 --> statement-breakpoint
 CREATE TABLE "outreach_events" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"client_id" text NOT NULL,
+	"project_id" text NOT NULL,
 	"campaign_id" text NOT NULL,
 	"run_id" uuid NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -118,7 +118,7 @@ CREATE TABLE "outreach_events" (
 --> statement-breakpoint
 CREATE TABLE "runs" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"client_id" text NOT NULL,
+	"project_id" text NOT NULL,
 	"campaign_id" text,
 	"stage" "stage" NOT NULL,
 	"job" text NOT NULL,
@@ -136,7 +136,7 @@ CREATE TABLE "runs" (
 --> statement-breakpoint
 CREATE TABLE "signals" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"client_id" text NOT NULL,
+	"project_id" text NOT NULL,
 	"campaign_id" text,
 	"run_id" uuid NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -152,7 +152,7 @@ CREATE TABLE "signals" (
 --> statement-breakpoint
 CREATE TABLE "suppression" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"client_id" text NOT NULL,
+	"project_id" text NOT NULL,
 	"campaign_id" text,
 	"run_id" uuid NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -171,15 +171,15 @@ ALTER TABLE "contacts" ADD CONSTRAINT "contacts_account_id_accounts_id_fk" FOREI
 ALTER TABLE "outreach_events" ADD CONSTRAINT "outreach_events_campaign_lead_id_campaign_leads_id_fk" FOREIGN KEY ("campaign_lead_id") REFERENCES "public"."campaign_leads"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "signals" ADD CONSTRAINT "signals_account_id_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."accounts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "signals" ADD CONSTRAINT "signals_contact_id_contacts_id_fk" FOREIGN KEY ("contact_id") REFERENCES "public"."contacts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-CREATE UNIQUE INDEX "accounts_client_tam_domain_uq" ON "accounts" USING btree ("client_id","tam_id","domain");--> statement-breakpoint
-CREATE UNIQUE INDEX "campaign_leads_campaign_contact_uq" ON "campaign_leads" USING btree ("client_id","campaign_id","contact_id");--> statement-breakpoint
-CREATE INDEX "campaign_leads_status_idx" ON "campaign_leads" USING btree ("client_id","campaign_id","status");--> statement-breakpoint
-CREATE UNIQUE INDEX "contacts_client_linkedin_uq" ON "contacts" USING btree ("client_id","linkedin_url");--> statement-breakpoint
-CREATE INDEX "contacts_client_email_idx" ON "contacts" USING btree ("client_id","email");--> statement-breakpoint
-CREATE INDEX "costs_client_campaign_idx" ON "costs" USING btree ("client_id","campaign_id");--> statement-breakpoint
-CREATE UNIQUE INDEX "enrichments_cache_uq" ON "enrichments" USING btree ("client_id","provider","operation","input_key");--> statement-breakpoint
-CREATE UNIQUE INDEX "outreach_events_external_uq" ON "outreach_events" USING btree ("client_id","external_ref","kind");--> statement-breakpoint
-CREATE INDEX "runs_client_campaign_idx" ON "runs" USING btree ("client_id","campaign_id");--> statement-breakpoint
-CREATE INDEX "signals_client_account_idx" ON "signals" USING btree ("client_id","account_id","signal_key");--> statement-breakpoint
-CREATE INDEX "suppression_client_domain_idx" ON "suppression" USING btree ("client_id","domain");--> statement-breakpoint
-CREATE INDEX "suppression_client_email_idx" ON "suppression" USING btree ("client_id","email");
+CREATE UNIQUE INDEX "accounts_project_tam_domain_uq" ON "accounts" USING btree ("project_id","tam_id","domain");--> statement-breakpoint
+CREATE UNIQUE INDEX "campaign_leads_campaign_contact_uq" ON "campaign_leads" USING btree ("project_id","campaign_id","contact_id");--> statement-breakpoint
+CREATE INDEX "campaign_leads_status_idx" ON "campaign_leads" USING btree ("project_id","campaign_id","status");--> statement-breakpoint
+CREATE UNIQUE INDEX "contacts_project_linkedin_uq" ON "contacts" USING btree ("project_id","linkedin_url");--> statement-breakpoint
+CREATE INDEX "contacts_project_email_idx" ON "contacts" USING btree ("project_id","email");--> statement-breakpoint
+CREATE INDEX "costs_project_campaign_idx" ON "costs" USING btree ("project_id","campaign_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "enrichments_cache_uq" ON "enrichments" USING btree ("project_id","provider","operation","input_key");--> statement-breakpoint
+CREATE UNIQUE INDEX "outreach_events_external_uq" ON "outreach_events" USING btree ("project_id","external_ref","kind");--> statement-breakpoint
+CREATE INDEX "runs_project_campaign_idx" ON "runs" USING btree ("project_id","campaign_id");--> statement-breakpoint
+CREATE INDEX "signals_project_account_idx" ON "signals" USING btree ("project_id","account_id","signal_key");--> statement-breakpoint
+CREATE INDEX "suppression_project_domain_idx" ON "suppression" USING btree ("project_id","domain");--> statement-breakpoint
+CREATE INDEX "suppression_project_email_idx" ON "suppression" USING btree ("project_id","email");

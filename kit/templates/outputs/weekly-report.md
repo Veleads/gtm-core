@@ -1,4 +1,4 @@
-# Weekly report: <client> · week <YYYY-Www>
+# Weekly report: <project> · week <YYYY-Www>
 
 > Saved as campaigns/<campaign>/reports/<YYYY-Www>.md. Aggregates only.
 

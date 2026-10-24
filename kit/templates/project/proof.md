@@ -1,4 +1,4 @@
-# Proof: __CLIENT_NAME__
+# Proof: __PROJECT_NAME__
 
 Only items marked **approved for outbound** may appear in copy.
 

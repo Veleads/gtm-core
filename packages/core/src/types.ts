@@ -1,6 +1,6 @@
 /** Every job runs inside a RunContext. Every DB row and cost entry carries these ids. */
 export interface RunContext {
-  clientId: string;
+  projectId: string;
   campaignId: string | null;
   runId: string;
   triggeredBy: string;

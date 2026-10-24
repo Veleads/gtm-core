@@ -40,6 +40,6 @@ jobs:
             pnpm-lock.yaml
             AGENTS.md
             .gtm/**
-            client.yaml
+            project.yaml
             context/*.yaml
             campaigns/*/config.yaml

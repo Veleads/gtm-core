@@ -1,4 +1,4 @@
-# Intake: __CLIENT_NAME__
+# Intake: __PROJECT_NAME__
 
 > Stage 0 output. Fill every section; write "unknown" rather than leaving blanks.
 
@@ -31,13 +31,13 @@
 ## Access checklist
 | Item | Owner | Status |
 |---|---|---|
-| CRM export: customers + open deals (domains only) for suppression | client | |
-| Do-not-contact list | client | |
-| Previously contacted list (last 90 days) | client | |
-| Sending domains purchased | agency | |
-| Inboxes created + warmup started (date) | agency | |
-| Sender workspace created | agency | |
-| Calendar / booking link | client | |
-| Lawful basis documented (LIA for EU/UK legitimate interest) | client + agency | |
-| Privacy notice URL | client | |
-| Named approver for ICP + copy | client | |
+| CRM export: customers + open deals (domains only) for suppression | stakeholder | |
+| Do-not-contact list | stakeholder | |
+| Previously contacted list (last 90 days) | stakeholder | |
+| Sending domains purchased | GTM team | |
+| Inboxes created + warmup started (date) | GTM team | |
+| Sender workspace created | GTM team | |
+| Calendar / booking link | stakeholder | |
+| Lawful basis documented (LIA for EU/UK legitimate interest) | stakeholder + GTM team | |
+| Privacy notice URL | stakeholder | |
+| Named approver for ICP + copy | stakeholder | |

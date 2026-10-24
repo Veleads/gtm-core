@@ -12,15 +12,15 @@ export interface CommandHelp {
 
 export const COMMANDS: Record<string, CommandHelp> = {
   init: {
-    usage: 'gtm init <client-slug> --name "<Client Name>" [--dir <path>]',
-    summary: "scaffold a new client repo",
+    usage: 'gtm init <project-slug> --name "<Project Name>" [--dir <path>]',
+    summary: "scaffold a new project repo",
     details: [
-      "Creates a complete client repo: client.yaml, context/ templates, campaigns/, tam/, CLIENT.md,",
+      "Creates a complete project repo: project.yaml, context/ templates, campaigns/, tam/, PROJECT.md,",
       "CI workflows, .gtm/ (core kit) and AGENTS.md, pinned to this CLI's version, then runs git init.",
-      "Push the result to a PRIVATE repo: it will hold client context.",
+      "Push the result to a PRIVATE repo: it will hold project context.",
     ],
-    writes: "A new folder (default ./gtm-client-<slug>). Refuses if it exists and is not empty.",
-    examples: ['npx @veleads/gtm init acme --name "Acme Corp"', 'npx @veleads/gtm init acme --name "Acme Corp" --dir ./clients/acme'],
+    writes: "A new folder (default ./gtm-project-<slug>). Refuses if it exists and is not empty.",
+    examples: ['npx @veleads/gtm init acme --name "Acme Corp"', 'npx @veleads/gtm init acme --name "Acme Corp" --dir ./projects/acme'],
   },
   "new-campaign": {
     usage: "gtm new-campaign <campaign-slug>",
@@ -33,7 +33,7 @@ export const COMMANDS: Record<string, CommandHelp> = {
     usage: "gtm validate [campaign]",
     summary: "check repo against schemas, gates, data rules",
     details: [
-      "Checks client.yaml, context/ and campaigns against the schemas; segment/persona/signal references;",
+      "Checks project.yaml, context/ and campaigns against the schemas; segment/persona/signal references;",
       "gate order (no stage past an unapproved or changed ICP/copy approval); required files; run-log names;",
       "no lead data (blocks data files, warns on email addresses); .gtm/ matches the installed core.",
       "Exit code 1 if there is any error; warnings never fail.",
@@ -44,12 +44,12 @@ export const COMMANDS: Record<string, CommandHelp> = {
   status: {
     usage: "gtm status",
     summary: "campaigns, stages, gates",
-    details: ["One screen: client, core version, ICP gate, and per campaign the stage, copy/launch gates, owner and latest run log."],
+    details: ["One screen: project, core version, ICP gate, and per campaign the stage, copy/launch gates, owner and latest run log."],
     writes: "Nothing (read-only).",
     examples: ["pnpm gtm status"],
   },
   approve: {
-    usage: 'gtm approve icp --by "<Name (side)>" [--notes ".."] [--date YYYY-MM-DD]\ngtm approve copy <campaign> --by "<Name (side)>" [--notes ".."] [--date YYYY-MM-DD]',
+    usage: 'gtm approve icp --by "<Name (role)>" [--notes ".."] [--date YYYY-MM-DD]\ngtm approve copy <campaign> --by "<Name (role)>" [--notes ".."] [--date YYYY-MM-DD]',
     summary: "record a sign-off and pin a hash of the approved content",
     details: [
       "Run ONLY after the named human explicitly approved in this session (AGENTS.md section 4).",
@@ -58,7 +58,7 @@ export const COMMANDS: Record<string, CommandHelp> = {
       "The launch gate is recorded by hand in config.yaml (its content is the lead set).",
     ],
     writes: "context/icp.yaml → approval (icp), or campaigns/<campaign>/config.yaml → gates.copy (copy).",
-    examples: ['pnpm gtm approve icp --by "Maria Chen (client)" --notes "Segments A+B, personas CFO+AP"', 'pnpm gtm approve copy q1-uk-cfo --by "Maria Chen (client)"'],
+    examples: ['pnpm gtm approve icp --by "Maria Chen (VP Marketing)" --notes "Segments A+B, personas CFO+AP"', 'pnpm gtm approve copy q1-uk-cfo --by "Maria Chen (VP Marketing)"'],
   },
   sync: {
     usage: "gtm sync [--check]",
@@ -73,7 +73,7 @@ export const COMMANDS: Record<string, CommandHelp> = {
   migrate: {
     usage: "gtm migrate [--dry-run]",
     summary: "upgrade YAML files to current schema versions",
-    details: ["Applies core schema migrations to client.yaml, context/*.yaml and campaigns/*/config.yaml, keeping comments."],
+    details: ["Applies core schema migrations to project.yaml, context/*.yaml and campaigns/*/config.yaml, keeping comments."],
     writes: "Those YAML files, only if a migration applies. With --dry-run: nothing.",
     examples: ["pnpm gtm migrate --dry-run", "pnpm gtm migrate"],
   },
@@ -102,9 +102,9 @@ export const COMMANDS: Record<string, CommandHelp> = {
 export function generalHelp(version: string): string {
   const width = Math.max(...Object.keys(COMMANDS).map((c) => c.length));
   const lines = Object.entries(COMMANDS).map(([name, c]) => `  ${name.padEnd(width)}  ${c.summary}`);
-  return `gtm v${version}: CLI for gtm-brain client repos (@veleads/gtm)
+  return `gtm v${version}: CLI for gtm-brain project repos (@veleads/gtm)
 
-Usage: gtm <command> [options]      (inside a client repo: pnpm gtm <command>)
+Usage: gtm <command> [options]      (inside a project repo: pnpm gtm <command>)
 
 Commands:
 ${lines.join("\n")}
@@ -118,7 +118,7 @@ Global options:
 
 Exit codes: 0 success, 1 failure or validation errors.
 
-For coding agents: inside a client repo, read AGENTS.md first and follow it. Read-only commands
+For coding agents: inside a project repo, read AGENTS.md first and follow it. Read-only commands
 (validate, status, sync --check, migrate --dry-run) are always safe to run.`;
 }
 

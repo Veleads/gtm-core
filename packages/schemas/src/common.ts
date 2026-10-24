@@ -51,5 +51,5 @@ export const Approval = z
   );
 export type Approval = z.infer<typeof Approval>;
 
-/** Where a field's value came from: provider slug, "client", "manual" or "derived". Required for GDPR. */
+/** Where a field's value came from: provider slug, "project" (supplied by the project owner), "manual" or "derived". Required for GDPR. */
 export const FieldSources = z.record(z.string(), z.string().min(1));

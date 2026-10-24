@@ -1,4 +1,4 @@
-# Voice: __CLIENT_NAME__
+# Voice: __PROJECT_NAME__
 
 - Language / spelling:
 - Tone:

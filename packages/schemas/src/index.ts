@@ -1,5 +1,5 @@
 export * from "./common.ts";
-export * from "./client.ts";
+export * from "./project.ts";
 export * from "./icp.ts";
 export * from "./signals-config.ts";
 export * from "./campaign-config.ts";

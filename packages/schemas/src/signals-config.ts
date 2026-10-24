@@ -17,7 +17,7 @@ export type SignalDefinition = z.infer<typeof SignalDefinition>;
 export const SignalsFile = z
   .object({
     version: z.literal(FILE_VERSIONS.signals),
-    client_id: Slug,
+    project_id: Slug,
     signals: z.array(SignalDefinition).min(1),
   })
   .superRefine((f, ctx) => {

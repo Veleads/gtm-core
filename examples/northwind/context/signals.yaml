@@ -1,5 +1,5 @@
-version: 1
-client_id: northwind
+version: 2
+project_id: northwind
 signals:
   - key: hiring-ap-staff
     description: Open job posting for AP clerk / AP specialist / purchase ledger roles

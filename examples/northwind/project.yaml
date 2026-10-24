@@ -1,11 +1,11 @@
-version: 1
-client_id: northwind
+version: 2
+project_id: northwind
 name: Northwind Ledger (fictional example)
 status: active
 started_at: 2026-09-01
 owners:
   gtm_engineer: alex
   sdrs: [jdoe]
-  client_approver: "Maria Chen (VP Marketing, Northwind)"
+  approver: "Maria Chen (VP Marketing, Northwind)"
 regions: [UK, EU]
 features: {}

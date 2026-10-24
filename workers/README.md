@@ -15,8 +15,8 @@ Planned (Phase 2+), one workflow per job in AGENTS.md section 7:
 | `push` / `activate` | `SenderAdapter` | push creates PAUSED only |
 | `results` | `SenderAdapter.pullEvents` | scheduled, plus on-demand |
 
-Workers never read client repos: `gtm job` (run inside a client repo) validates the campaign and sends
-the resolved config + context as the job payload, with the client repo commit and core version.
+Workers never read project repos: `gtm job` (run inside a project repo) validates the campaign and sends
+the resolved config + context as the job payload, with the project repo commit and core version.
 Workers accept the current and previous schema version of every file kind (see AGENTS.md section 2).
 
 Rules: every workflow run creates a `runs` row first, passes `RunContext` everywhere, and prints

@@ -1,6 +1,6 @@
 # Copy: uk-mfg-hiring
 
-> Stage 5 output. Status: **awaiting client sign-off** (config.yaml `gates.copy`).
+> Stage 5 output. Status: **awaiting sign-off** (config.yaml `gates.copy`).
 > Variables available: `{{first_name}}`, `{{company_name}}`, `{{signal_line}}`, `{{sender_first_name}}`.
 > `{{signal_line}}` is generated per lead from the signal's `messaging_angle` by the qualify job.
 

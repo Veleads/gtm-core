@@ -15,8 +15,8 @@ Know how big the market is, and whether the ICP filters are right, before spendi
 
 ## Steps
 1. Confirm the ICP gate is approved. If not, stop and go back to `01-icp`.
-2. Set `tam_id` in `config.yaml` (`<client>-tam-<YYYYqN>` or similar). Reuse an existing `tam_id`
-   if the same client already has a TAM built from the same approved ICP.
+2. Set `tam_id` in `config.yaml` (`<project>-tam-<YYYYqN>` or similar). Reuse an existing `tam_id`
+   if the same project already has a TAM built from the same approved ICP.
 3. Trigger the job: `pnpm gtm job tam <campaign>`. It reads segment filters from `icp.yaml`,
    pulls accounts through the configured account-source adapter, writes them to `accounts`, and
    prints counts per segment. **You do not page through accounts yourself.**
@@ -32,7 +32,7 @@ Know how big the market is, and whether the ICP filters are right, before spendi
 7. Write `tam/<tam_id>.md` from `.gtm/templates/outputs/tam-summary.md` and the run log.
 
 ## Outputs
-- Rows in `accounts` (Postgres), tagged `client_id`, `tam_id`, `run_id`.
+- Rows in `accounts` (Postgres), tagged `project_id`, `tam_id`, `run_id`.
 - `tam/<tam_id>.md` with funnel table and sanity check. Run log.
 
 ## Checklist

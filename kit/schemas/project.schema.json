@@ -4,9 +4,9 @@
   "properties": {
     "version": {
       "type": "number",
-      "const": 1
+      "const": 2
     },
-    "client_id": {
+    "project_id": {
       "type": "string",
       "pattern": "^[a-z0-9][a-z0-9-]*$"
     },
@@ -20,7 +20,7 @@
         "onboarding",
         "active",
         "paused",
-        "churned"
+        "closed"
       ]
     },
     "started_at": {
@@ -42,16 +42,16 @@
             "minLength": 1
           }
         },
-        "client_approver": {
+        "approver": {
           "type": "string",
           "minLength": 1,
-          "description": "Client-side person who signs off ICP and copy"
+          "description": "Person who signs off ICP and copy for this project"
         }
       },
       "required": [
         "gtm_engineer",
         "sdrs",
-        "client_approver"
+        "approver"
       ]
     },
     "regions": {
@@ -77,7 +77,7 @@
   },
   "required": [
     "version",
-    "client_id",
+    "project_id",
     "name",
     "status",
     "started_at",

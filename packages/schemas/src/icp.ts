@@ -34,7 +34,7 @@ export type IcpPersona = z.infer<typeof IcpPersona>;
 export const IcpFile = z
   .object({
     version: z.literal(FILE_VERSIONS.icp),
-    client_id: Slug,
+    project_id: Slug,
     approval: Approval,
     segments: z.array(IcpSegment).min(1),
     personas: z.array(IcpPersona).min(1),

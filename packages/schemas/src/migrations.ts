@@ -1,9 +1,9 @@
-import type { Document } from "yaml";
+import { isMap, isScalar, type Document } from "yaml";
 import { FILE_VERSIONS, type FileKind } from "./versions.ts";
 
 /**
- * One step that rewrites a client YAML file from `from` to `from + 1`. Edit the parsed Document
- * in place (doc.setIn / doc.deleteIn) so comments and formatting in client files survive.
+ * One step that rewrites a project YAML file from `from` to `from + 1`. Edit the parsed Document
+ * in place (doc.setIn / doc.deleteIn) so comments and formatting in project files survive.
  */
 export interface Migration {
   kind: FileKind;
@@ -12,8 +12,30 @@ export interface Migration {
   up(doc: Document): void;
 }
 
+/** Renames a key in place, keeping its position, value and comments. No-op if absent. */
+export function renameKey(doc: Document, path: (string | number)[], from: string, to: string): void {
+  const node = path.length ? doc.getIn(path, true) : doc.contents;
+  if (!isMap(node)) return;
+  const pair = node.items.find((p) => (isScalar(p.key) ? p.key.value : p.key) === from);
+  if (!pair) return;
+  if (isScalar(pair.key)) pair.key.value = to;
+  else (pair as { key: unknown }).key = to;
+}
+
+const renameClientId = (doc: Document) => renameKey(doc, [], "client_id", "project_id");
+
 /** Registry. Append only; never edit a released migration. */
-export const MIGRATIONS: Migration[] = [];
+export const MIGRATIONS: Migration[] = [
+  // 0.3.0: "clients" became "projects" (one private repo per project).
+  { kind: "project", from: 1, description: "client_id → project_id, owners.client_approver → owners.approver, status churned → closed", up(doc) {
+    renameClientId(doc);
+    renameKey(doc, ["owners"], "client_approver", "approver");
+    if (doc.get("status") === "churned") doc.set("status", "closed");
+  } },
+  { kind: "icp", from: 1, description: "client_id → project_id", up: renameClientId },
+  { kind: "signals", from: 1, description: "client_id → project_id", up: renameClientId },
+  { kind: "campaign-config", from: 1, description: "client_id → project_id", up: renameClientId },
+];
 
 export interface MigrationResult {
   from: number;

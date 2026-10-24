@@ -4,6 +4,12 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+- **migration** "Clients" are now **projects**: one private repo = one project.
+  `client.yaml` → `project.yaml`, `CLIENT.md` → `PROJECT.md`, `client_id` → `project_id` in every YAML
+  file (all kinds now version 2), `owners.client_approver` → `owners.approver`, project status
+  `churned` → `closed`. `gtm migrate` (run by `gtm upgrade`) renames the files and keys in place,
+  keeping comments; existing ICP/copy approvals stay valid. New repos are named `gtm-project-<slug>`.
+- **action** Approvals are recorded as name and role, e.g. `--by "Maria Chen (VP Marketing)"`.
 
 ## [0.2.1] - 2026-10-24
 - **no action** The npm package now has a README (what it is, quick start, commands, guidance for

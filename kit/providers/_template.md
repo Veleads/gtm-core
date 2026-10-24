@@ -3,7 +3,7 @@
 > One file per vendor, named `providers/<slug>.md`. The slug is what config.yaml uses.
 > Every number here must have a source and a "verified on" date. Unverified = write UNVERIFIED.
 > This file is public (it ships in the open-source core): **list prices and public docs only**.
-> Negotiated prices and hit rates measured on client work stay in the private ops notes / Postgres.
+> Negotiated prices and hit rates measured on project work stay in the private ops notes / Postgres.
 
 - **Slug:** `<slug>`
 - **Category:** account_source | enrich | verify | signals | sender

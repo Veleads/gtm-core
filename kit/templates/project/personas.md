@@ -1,4 +1,4 @@
-# Personas: __CLIENT_NAME__
+# Personas: __PROJECT_NAME__
 
 ## <persona-id> (role)
 - **Cares about:**

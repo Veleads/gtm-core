@@ -1,4 +1,4 @@
-// gtm upgrade [version]: moves this client repo to a newer core, safely.
+// gtm upgrade [version]: moves this project repo to a newer core, safely.
 //   install exact version → sync kit → migrate YAML → validate → print changelog.
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -9,7 +9,7 @@ import { campaignStages } from "./status.ts";
 import { pinnedVersion } from "./validate.ts";
 
 /**
- * Runs pnpm: from PATH if available, else the exact version pinned in the client's
+ * Runs pnpm: from PATH if available, else the exact version pinned in the project's
  * package.json "packageManager" via npx. (npm_execpath is unreliable: under npx it points to npm.)
  */
 function pm(root: string, args: string[]): number {
@@ -23,7 +23,7 @@ const FROZEN_STAGES = ["qa", "launch"];
 
 export function runUpgrade(root: string, opts: { version?: string; force?: boolean }): boolean {
   const before = pinnedVersion(root);
-  if (!before) { console.error(`package.json does not depend on ${PACKAGE_NAME}: is this a client repo?`); return false; }
+  if (!before) { console.error(`package.json does not depend on ${PACKAGE_NAME}: is this a project repo?`); return false; }
 
   const frozen = campaignStages(root).filter((c) => FROZEN_STAGES.includes(c.stage));
   if (frozen.length && !opts.force) {

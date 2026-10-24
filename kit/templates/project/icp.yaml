@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=../.gtm/schemas/icp.schema.json
-version: 1
-client_id: __CLIENT_ID__
+version: 2
+project_id: __PROJECT_ID__
 approval:
   status: pending # only a named human approves (AGENTS.md hard stop)
   approved_by: null

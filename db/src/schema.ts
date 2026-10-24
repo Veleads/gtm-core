@@ -1,5 +1,5 @@
 // Data layer. Rules (AGENTS.md "Data rules"):
-// - every row carries client_id, campaign_id (null when not campaign-scoped), run_id, timestamps
+// - every row carries project_id, campaign_id (null when not campaign-scoped), run_id, timestamps
 // - PII lives here and nowhere else; git only ever gets aggregates
 import { sql } from "drizzle-orm";
 import {
@@ -7,7 +7,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 const scope = {
-  clientId: text("client_id").notNull(),
+  projectId: text("project_id").notNull(),
   campaignId: text("campaign_id"),
   runId: uuid("run_id").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -29,7 +29,7 @@ export const outreachEventEnum = pgEnum("outreach_event", ["sent", "opened", "re
 /** One row per job execution. run_id is referenced by every other table and by run logs in git. */
 export const runs = pgTable("runs", {
   id: uuid("id").primaryKey().defaultRandom(),
-  clientId: text("client_id").notNull(),
+  projectId: text("project_id").notNull(),
   campaignId: text("campaign_id"),
   stage: stageEnum("stage").notNull(),
   job: text("job").notNull(),
@@ -43,7 +43,7 @@ export const runs = pgTable("runs", {
   startedAt: timestamp("started_at", { withTimezone: true }),
   finishedAt: timestamp("finished_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-}, (t) => [index("runs_client_campaign_idx").on(t.clientId, t.campaignId)]);
+}, (t) => [index("runs_project_campaign_idx").on(t.projectId, t.campaignId)]);
 
 export const accounts = pgTable("accounts", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -60,7 +60,7 @@ export const accounts = pgTable("accounts", {
   technologies: text("technologies").array().notNull().default(sql`'{}'::text[]`),
   reachable: boolean("reachable"),
   fieldSources: jsonb("field_sources").notNull().default({}),
-}, (t) => [uniqueIndex("accounts_client_tam_domain_uq").on(t.clientId, t.tamId, t.domain)]);
+}, (t) => [uniqueIndex("accounts_project_tam_domain_uq").on(t.projectId, t.tamId, t.domain)]);
 
 export const contacts = pgTable("contacts", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -79,8 +79,8 @@ export const contacts = pgTable("contacts", {
   verifiedAt: timestamp("verified_at", { withTimezone: true }),
   fieldSources: jsonb("field_sources").notNull().default({}),
 }, (t) => [
-  uniqueIndex("contacts_client_linkedin_uq").on(t.clientId, t.linkedinUrl),
-  index("contacts_client_email_idx").on(t.clientId, t.email),
+  uniqueIndex("contacts_project_linkedin_uq").on(t.projectId, t.linkedinUrl),
+  index("contacts_project_email_idx").on(t.projectId, t.email),
 ]);
 
 /** Raw provider responses cached by input key. Re-running a job never re-pays for the same input. */
@@ -94,7 +94,7 @@ export const enrichments = pgTable("enrichments", {
   response: jsonb("response"),
   ok: boolean("ok").notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-}, (t) => [uniqueIndex("enrichments_cache_uq").on(t.clientId, t.provider, t.operation, t.inputKey)]);
+}, (t) => [uniqueIndex("enrichments_cache_uq").on(t.projectId, t.provider, t.operation, t.inputKey)]);
 
 export const signals = pgTable("signals", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -106,9 +106,9 @@ export const signals = pgTable("signals", {
   source: text("source").notNull(),
   evidenceUrl: text("evidence_url"),
   summary: text("summary").notNull(),
-}, (t) => [index("signals_client_account_idx").on(t.clientId, t.accountId, t.signalKey)]);
+}, (t) => [index("signals_project_account_idx").on(t.projectId, t.accountId, t.signalKey)]);
 
-/** campaign_id null = applies to every campaign of the client. Match on domain and/or email. */
+/** campaign_id null = applies to every campaign of the project. Match on domain and/or email. */
 export const suppression = pgTable("suppression", {
   id: uuid("id").primaryKey().defaultRandom(),
   ...scope,
@@ -119,8 +119,8 @@ export const suppression = pgTable("suppression", {
   source: text("source").notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }),
 }, (t) => [
-  index("suppression_client_domain_idx").on(t.clientId, t.domain),
-  index("suppression_client_email_idx").on(t.clientId, t.email),
+  index("suppression_project_domain_idx").on(t.projectId, t.domain),
+  index("suppression_project_email_idx").on(t.projectId, t.email),
 ]);
 
 export const campaignLeads = pgTable("campaign_leads", {
@@ -141,8 +141,8 @@ export const campaignLeads = pgTable("campaign_leads", {
   senderLeadRef: text("sender_lead_ref"),
   pushedAt: timestamp("pushed_at", { withTimezone: true }),
 }, (t) => [
-  uniqueIndex("campaign_leads_campaign_contact_uq").on(t.clientId, t.campaignId, t.contactId),
-  index("campaign_leads_status_idx").on(t.clientId, t.campaignId, t.status),
+  uniqueIndex("campaign_leads_campaign_contact_uq").on(t.projectId, t.campaignId, t.contactId),
+  index("campaign_leads_status_idx").on(t.projectId, t.campaignId, t.status),
 ]);
 
 export const outreachEvents = pgTable("outreach_events", {
@@ -155,7 +155,7 @@ export const outreachEvents = pgTable("outreach_events", {
   variant: text("variant"),
   occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull(),
   externalRef: text("external_ref").notNull(),
-}, (t) => [uniqueIndex("outreach_events_external_uq").on(t.clientId, t.externalRef, t.kind)]);
+}, (t) => [uniqueIndex("outreach_events_external_uq").on(t.projectId, t.externalRef, t.kind)]);
 
 export const costs = pgTable("costs", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -166,4 +166,4 @@ export const costs = pgTable("costs", {
   unitCostUsd: numeric("unit_cost_usd", { precision: 12, scale: 6 }).notNull(),
   totalUsd: numeric("total_usd", { precision: 12, scale: 6 }).notNull(),
   cached: boolean("cached").notNull().default(false),
-}, (t) => [index("costs_client_campaign_idx").on(t.clientId, t.campaignId)]);
+}, (t) => [index("costs_project_campaign_idx").on(t.projectId, t.campaignId)]);
