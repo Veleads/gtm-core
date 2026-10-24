@@ -1,12 +1,11 @@
 import { z } from "zod";
-import { Domain, FieldSources, Slug } from "./common.ts";
+import { Domain, FieldSources } from "./common.ts";
 
 export const EmailStatus = z.enum(["valid", "catch_all", "invalid", "unknown", "not_found"]);
 export type EmailStatus = z.infer<typeof EmailStatus>;
 
 /** Normalized contact (stage 3). */
 export const Contact = z.object({
-  project_id: Slug,
   account_domain: Domain,
   first_name: z.string().min(1),
   last_name: z.string().min(1),

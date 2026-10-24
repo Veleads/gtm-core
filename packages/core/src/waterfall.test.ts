@@ -7,14 +7,14 @@ import { BudgetExceededError, CostTracker, type CostEntry, type CostSink } from 
 import type { RunContext } from "./types.ts";
 import { runEmailWaterfall } from "./waterfall.ts";
 
-const ctx: RunContext = { projectId: "_example", campaignId: "_example", runId: "00000000-0000-4000-8000-000000000000", triggeredBy: "test" };
+const ctx: RunContext = { campaignId: "_example", runId: "00000000-0000-4000-8000-000000000000", triggeredBy: "test" };
 const input = { firstName: "Ada", lastName: "Lovelace", domain: "example.com", linkedinUrl: null };
 
 function memoryCache(): EnrichmentCache {
   const store = new Map<string, CachedResponse>();
   return {
-    async get<T>(c: string, p: string, o: string, k: string) { return (store.get([c, p, o, k].join("|")) as CachedResponse<T>) ?? null; },
-    async put(c, p, o, k, v) { store.set([c, p, o, k].join("|"), v); },
+    async get<T>(p: string, o: string, k: string) { return (store.get([p, o, k].join("|")) as CachedResponse<T>) ?? null; },
+    async put(p, o, k, v) { store.set([p, o, k].join("|"), v); },
   };
 }
 

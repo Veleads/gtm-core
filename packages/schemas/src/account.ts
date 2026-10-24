@@ -3,7 +3,6 @@ import { Domain, FieldSources, Slug } from "./common.ts";
 
 /** Normalized account as produced by an AccountSource adapter (stage 2). */
 export const Account = z.object({
-  project_id: Slug,
   tam_id: Slug,
   domain: Domain,
   name: z.string().min(1),

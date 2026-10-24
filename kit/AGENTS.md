@@ -26,8 +26,8 @@ Three layers, never mixed:
 | Layer | Where | Holds | Never holds |
 |---|---|---|---|
 | **Brain** | git (this repo) | context, configs, copy, run logs, aggregate reports | PII, lead lists, exports, secrets |
-| **Execution** | central workers (deployed from gtm-core, run on Hatchet) | TAM build, enrichment waterfall, verification, scoring, signals, sender push | business decisions |
-| **Data** | central Postgres | accounts, contacts, enrichments, signals, suppression, campaign leads, events, runs, costs | anything not scoped by `project_id` + `run_id` |
+| **Execution** | this project's workers (gtm-core code, run on Hatchet) | TAM build, enrichment waterfall, verification, scoring, signals, sender push | business decisions |
+| **Data** | this project's own Postgres (one database per project) | accounts, contacts, enrichments, signals, suppression, campaign leads, events, runs, costs | another project's data; rows without a `run_id` |
 
 **The agent orchestrates; code does bulk work.** The agent picks the playbook, edits config, runs a
 `npx gtm job` command, reads the aggregate output, QAs a small sample, and writes the run log. The
@@ -140,10 +140,12 @@ Rules, no exceptions:
 3. QA sample review happens in the DB console or terminal output. Do not paste sampled rows into files
    or PR descriptions; summarize ("19/20 correct persona").
 4. **Secrets** live only in `.env` (git-ignored) or the secret manager. Never print, echo, commit or
-   paste keys. Provider API keys never live in a project repo: they are on the central workers.
-5. Every DB row carries `project_id`, `campaign_id`, `run_id` and timestamps. Every job prints its `run_id`.
+   paste keys. Provider API keys never live in a project repo: they are on this project's workers.
+5. Every DB row carries `campaign_id`, `run_id` and timestamps (the database itself is the project scope).
+   Every job prints its `run_id`.
 6. Every lead field records its source (`field_sources`) so GDPR "where did you get my data?" can be answered.
-7. This project\x27s data is never mixed with another project\x27s: jobs are scoped by `project_id`.
+7. This project's data is never mixed with another project's: it has its own database, bound to this
+   `project_id` on the first job, and jobs for another project are refused.
 
 ## 6. Team and concurrency rules
 
@@ -214,7 +216,7 @@ Every job prints a `run_id`, counts and cost. Copy those into the run log.
   The PR contains the new `.gtm/`, `AGENTS.md`, lockfile, and any YAML migrations. Read the changelog
   in the PR body: entries marked **migration** or **action** need a human look.
 - Upgrades are refused while a campaign is in `qa` or `launch`. Live campaigns (`results`) keep running
-  on the central workers across upgrades; nothing changes for them mid-flight.
+  on this project's workers across upgrades; nothing changes for them mid-flight.
 - New opt-in capabilities appear as `features` in `project.yaml`; they are off until you enable them.
 - If `validate` says "run `npx gtm sync`" or "`migrate`", the repo and the installed core disagree:
   run the command, review the diff, commit it on its own branch.

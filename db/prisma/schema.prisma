@@ -1,5 +1,6 @@
 // Data layer (AGENTS.md "Data rules"):
-// - every row carries project_id, campaign_id (null when not campaign-scoped), run_id, timestamps
+// - one database per project: the database is the project scope, so rows carry no project_id
+// - every row carries campaign_id (null when not campaign-scoped), run_id, timestamps
 // - PII lives here and nowhere else; git only ever gets aggregates
 // Table and column names are snake_case in Postgres (@@map / @map); models are PascalCase in code.
 
@@ -95,10 +96,19 @@ enum OutreachEventKind {
   @@map("outreach_event")
 }
 
+/// Which project this database belongs to. Exactly one row (id = 1), written by the first job;
+/// workers refuse a job whose project_id differs, so a wrong DATABASE_URL never mixes projects.
+model Project {
+  id        Int      @id @default(1)
+  projectId String   @unique @map("project_id")
+  boundAt   DateTime @default(now()) @map("bound_at") @db.Timestamptz(6)
+
+  @@map("project")
+}
+
 /// One row per job execution. run_id is referenced by every other table and by run logs in git.
 model Run {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  projectId   String    @map("project_id")
   campaignId  String?   @map("campaign_id")
   stage       Stage
   job         String
@@ -113,13 +123,12 @@ model Run {
   finishedAt  DateTime? @map("finished_at") @db.Timestamptz(6)
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  @@index([projectId, campaignId], map: "runs_project_campaign_idx")
+  @@index([campaignId], map: "runs_campaign_idx")
   @@map("runs")
 }
 
 model Account {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  projectId     String   @map("project_id")
   campaignId    String?  @map("campaign_id")
   runId         String   @map("run_id") @db.Uuid
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -141,13 +150,12 @@ model Account {
   signals       Signal[]
   campaignLeads CampaignLead[]
 
-  @@unique([projectId, tamId, domain], map: "accounts_project_tam_domain_uq")
+  @@unique([tamId, domain], map: "accounts_tam_domain_uq")
   @@map("accounts")
 }
 
 model Contact {
   id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  projectId    String      @map("project_id")
   campaignId   String?     @map("campaign_id")
   runId        String      @map("run_id") @db.Uuid
   createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -170,15 +178,14 @@ model Contact {
   signals       Signal[]
   campaignLeads CampaignLead[]
 
-  @@unique([projectId, linkedinUrl], map: "contacts_project_linkedin_uq")
-  @@index([projectId, email], map: "contacts_project_email_idx")
+  @@unique([linkedinUrl], map: "contacts_linkedin_uq")
+  @@index([email], map: "contacts_email_idx")
   @@map("contacts")
 }
 
 /// Raw provider responses cached by input key. Re-running a job never re-pays for the same input.
 model Enrichment {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  projectId  String   @map("project_id")
   campaignId String?  @map("campaign_id")
   runId      String   @map("run_id") @db.Uuid
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -191,13 +198,12 @@ model Enrichment {
   ok         Boolean
   expiresAt  DateTime @map("expires_at") @db.Timestamptz(6)
 
-  @@unique([projectId, provider, operation, inputKey], map: "enrichments_cache_uq")
+  @@unique([provider, operation, inputKey], map: "enrichments_cache_uq")
   @@map("enrichments")
 }
 
 model Signal {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  projectId   String   @map("project_id")
   campaignId  String?  @map("campaign_id")
   runId       String   @map("run_id") @db.Uuid
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -213,14 +219,13 @@ model Signal {
   account Account  @relation(fields: [accountId], references: [id])
   contact Contact? @relation(fields: [contactId], references: [id])
 
-  @@index([projectId, accountId, signalKey], map: "signals_project_account_idx")
+  @@index([accountId, signalKey], map: "signals_account_idx")
   @@map("signals")
 }
 
-/// campaign_id null = applies to every campaign of the project. Match on domain and/or email.
+/// campaign_id null = applies to every campaign in this database (the project). Match on domain and/or email.
 model Suppression {
   id         String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  projectId  String          @map("project_id")
   campaignId String?         @map("campaign_id")
   runId      String          @map("run_id") @db.Uuid
   createdAt  DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -232,14 +237,13 @@ model Suppression {
   source     String
   expiresAt  DateTime?       @map("expires_at") @db.Timestamptz(6)
 
-  @@index([projectId, domain], map: "suppression_project_domain_idx")
-  @@index([projectId, email], map: "suppression_project_email_idx")
+  @@index([domain], map: "suppression_domain_idx")
+  @@index([email], map: "suppression_email_idx")
   @@map("suppression")
 }
 
 model CampaignLead {
   id                   String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  projectId            String           @map("project_id")
   campaignId           String           @map("campaign_id")
   runId                String           @map("run_id") @db.Uuid
   createdAt            DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -262,14 +266,13 @@ model CampaignLead {
   account        Account         @relation(fields: [accountId], references: [id])
   outreachEvents OutreachEvent[]
 
-  @@unique([projectId, campaignId, contactId], map: "campaign_leads_campaign_contact_uq")
-  @@index([projectId, campaignId, status], map: "campaign_leads_status_idx")
+  @@unique([campaignId, contactId], map: "campaign_leads_campaign_contact_uq")
+  @@index([campaignId, status], map: "campaign_leads_status_idx")
   @@map("campaign_leads")
 }
 
 model OutreachEvent {
   id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  projectId      String            @map("project_id")
   campaignId     String            @map("campaign_id")
   runId          String            @map("run_id") @db.Uuid
   createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -283,13 +286,12 @@ model OutreachEvent {
 
   campaignLead CampaignLead @relation(fields: [campaignLeadId], references: [id])
 
-  @@unique([projectId, externalRef, kind], map: "outreach_events_external_uq")
+  @@unique([externalRef, kind], map: "outreach_events_external_uq")
   @@map("outreach_events")
 }
 
 model Cost {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  projectId   String   @map("project_id")
   campaignId  String?  @map("campaign_id")
   runId       String   @map("run_id") @db.Uuid
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -301,6 +303,6 @@ model Cost {
   totalUsd    Decimal  @map("total_usd") @db.Decimal(12, 6)
   cached      Boolean  @default(false)
 
-  @@index([projectId, campaignId], map: "costs_project_campaign_idx")
+  @@index([campaignId], map: "costs_campaign_idx")
   @@map("costs")
 }

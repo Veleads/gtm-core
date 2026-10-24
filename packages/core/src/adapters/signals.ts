@@ -8,5 +8,5 @@ export interface SignalsAdapter extends ProviderAdapter {
     ctx: RunContext,
     definition: SignalDefinition,
     accountDomains: string[],
-  ): Promise<AdapterResult<Omit<SignalEvent, "project_id">[]>>;
+  ): Promise<AdapterResult<SignalEvent[]>>;
 }
