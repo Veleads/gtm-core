@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read # gtm validate --verify-github reads PR reviews
 
 jobs:
   check:
@@ -25,5 +26,7 @@ jobs:
           fi
       - name: Core files untouched and in sync
         run: npx gtm sync --check
-      - name: Validate project repo
-        run: npx gtm validate
+      - name: Validate project repo (and verify GitHub approvals)
+        run: npx gtm validate --verify-github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

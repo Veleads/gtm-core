@@ -431,6 +431,11 @@
               "description": "Fingerprint of the approved content, written by `gtm approve`. Never edit by hand.",
               "type": "string",
               "pattern": "^sha256:[0-9a-f]{16}$"
+            },
+            "approved_via": {
+              "description": "Pull request whose review is the approval (GitHub mode). Written by `gtm approve --pr`.",
+              "type": "string",
+              "format": "uri"
             }
           },
           "required": [
@@ -480,6 +485,11 @@
               "description": "Fingerprint of the approved content, written by `gtm approve`. Never edit by hand.",
               "type": "string",
               "pattern": "^sha256:[0-9a-f]{16}$"
+            },
+            "approved_via": {
+              "description": "Pull request whose review is the approval (GitHub mode). Written by `gtm approve --pr`.",
+              "type": "string",
+              "format": "uri"
             }
           },
           "required": [

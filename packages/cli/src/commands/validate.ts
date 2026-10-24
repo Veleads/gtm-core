@@ -4,10 +4,12 @@ import { join } from "node:path";
 import { parse } from "yaml";
 import type { z } from "zod";
 import {
-  CampaignConfig, ProjectFile, FEATURES, FILE_VERSIONS, IcpFile, SignalsFile, Stage, copyContentHash, icpContentHash, type Approval, type FileKind,
+  CampaignConfig, ProjectFile, FEATURES, FILE_VERSIONS, IcpFile, SignalsFile, Stage, copyContentHash, icpContentHash, isGitHubHandle, type Approval, type FileKind,
 } from "@gtm/schemas";
 import { Report, subdirs, walk } from "../fsutil.ts";
 import { pendingRenames } from "./migrate.ts";
+import { GitHubApi, login } from "../github.ts";
+import { verifyRecordedApproval } from "../github-approval.ts";
 import { GTM_VERSION, KIT_DIR, PACKAGE_NAME } from "../paths.ts";
 
 const REQUIRED_CONTEXT = ["intake.md", "icp.md", "icp.yaml", "signals.yaml", "personas.md", "offer.md", "proof.md", "voice.md"];
@@ -87,7 +89,28 @@ function checkPinnedApproval(r: Report, contentFile: string, approval: Approval,
   return false;
 }
 
-function validateCampaign(r: Report, root: string, projectId: string, campaign: string, icp: IcpFile | null, signals: SignalsFile | null, icpApproved: boolean) {
+/** Approvals that name a PR, collected for `--verify-github` (CI). */
+interface PrApproval { file: string; what: string; approval: Approval; approver: string; contentPath: string; hashOf: (content: string) => string }
+
+/**
+ * GitHub mode (approver is "@handle"): an approval must come from a PR review by that approver
+ * (approved_via + approved_by). Name approvers keep the recorded-by-name flow.
+ */
+function checkGitHubMode(r: Report, file: string, what: string, approval: Approval, approver: string | undefined, prApprovals: PrApproval[], content: Pick<PrApproval, "contentPath" | "hashOf">): boolean {
+  if (approval.status !== "approved" || !isGitHubHandle(approver)) return true;
+  if (!approval.approved_via) {
+    r.err(file, `${what} approval was recorded without a pull request, but the approver is ${approver} (GitHub mode): get an APPROVED review on a PR and run \`npx gtm approve ... --pr <number>\``);
+    return false;
+  }
+  if (!approval.approved_by || login(approval.approved_by) !== login(approver)) {
+    r.err(file, `${what} was approved by ${approval.approved_by}, but the project approver is ${approver}`);
+    return false;
+  }
+  prApprovals.push({ file, what, approval, approver, ...content });
+  return true;
+}
+
+function validateCampaign(r: Report, root: string, projectId: string, campaign: string, icp: IcpFile | null, signals: SignalsFile | null, icpApproved: boolean, approver: string | undefined, prApprovals: PrApproval[]) {
   const dir = join(root, "campaigns", campaign);
   console.log(`campaign ${campaign}`);
   for (const f of REQUIRED_CAMPAIGN) if (!existsSync(join(dir, f))) r.err(join(dir, f), "missing");
@@ -124,6 +147,7 @@ function validateCampaign(r: Report, root: string, projectId: string, campaign: 
     const copyFile = join(dir, "copy.md");
     const copyApproved = existsSync(copyFile)
       ? checkPinnedApproval(r, copyFile, cfg.gates.copy, copyContentHash(readFileSync(copyFile, "utf8")), "copy", `npx gtm approve copy ${campaign}`)
+        && checkGitHubMode(r, cfgFile, `copy (${campaign})`, cfg.gates.copy, approver, prApprovals, { contentPath: `campaigns/${campaign}/copy.md`, hashOf: copyContentHash })
       : false;
     if (stageIndex(cfg.stage) > stageIndex("copy") && !copyApproved) {
       r.err(cfgFile, `stage is "${cfg.stage}" but gates.copy is not approved, or copy.md changed since approval`);
@@ -147,7 +171,7 @@ function validateCampaign(r: Report, root: string, projectId: string, campaign: 
   }
 }
 
-export function runValidate(root: string, onlyCampaign?: string): boolean {
+export async function runValidate(root: string, onlyCampaign?: string, opts: { verifyGithub?: boolean; fetchImpl?: typeof fetch } = {}): Promise<boolean> {
   const r = new Report(root);
   console.log(`validating ${root} against core v${GTM_VERSION}`);
   checkCoreSync(r, root);
@@ -160,6 +184,7 @@ export function runValidate(root: string, onlyCampaign?: string): boolean {
       if (!FEATURES[key]) r.err(join(root, "project.yaml"), `unknown feature "${key}" (known: ${Object.keys(FEATURES).join(", ") || "none"})`);
     }
   }
+  if (!existsSync(join(root, "context", "research.md"))) r.warn(join(root, "context", "research.md"), "missing: run the research skill (.gtm/skills/research/SKILL.md) before intake questions");
   if (!existsSync(join(root, "PROJECT.md"))) r.warn(join(root, "PROJECT.md"), "missing (project-specific rules for agents)");
 
   for (const f of REQUIRED_CONTEXT) if (!existsSync(join(root, "context", f))) r.err(join(root, "context", f), "missing");
@@ -169,8 +194,11 @@ export function runValidate(root: string, onlyCampaign?: string): boolean {
   const signals = existsSync(sigFile) ? loadVersioned(r, sigFile, "signals", SignalsFile) : null;
   if (meta && icp && icp.project_id !== projectId) r.err(icpFile, `project_id "${icp.project_id}" does not match project.yaml "${projectId}"`);
   if (meta && signals && signals.project_id !== projectId) r.err(sigFile, `project_id "${signals.project_id}" does not match project.yaml "${projectId}"`);
+  const approver = meta?.owners.approver;
+  const prApprovals: PrApproval[] = [];
   const icpApproved = icp
     ? checkPinnedApproval(r, icpFile, icp.approval, icpContentHash(parse(readFileSync(icpFile, "utf8"))), "ICP", "npx gtm approve icp")
+      && checkGitHubMode(r, icpFile, "ICP", icp.approval, approver, prApprovals, { contentPath: "context/icp.yaml", hashOf: (t) => icpContentHash(parse(t)) })
     : false;
 
   checkNoLeadData(r, root);
@@ -178,7 +206,20 @@ export function runValidate(root: string, onlyCampaign?: string): boolean {
   const campaigns = onlyCampaign ? [onlyCampaign] : subdirs(join(root, "campaigns"));
   for (const c of campaigns) {
     if (!existsSync(join(root, "campaigns", c))) { r.err(join(root, "campaigns", c), "campaign folder not found"); continue; }
-    validateCampaign(r, root, projectId, c, icp, signals, icpApproved);
+    validateCampaign(r, root, projectId, c, icp, signals, icpApproved, approver, prApprovals);
+  }
+
+  // CI: confirm on GitHub that each recorded PR approval still holds (no-op without PR approvals).
+  if (opts.verifyGithub && prApprovals.length) {
+    const api = GitHubApi.fromRepo(root, opts.fetchImpl);
+    if (typeof api === "string") r.err(root, `--verify-github: ${api}`);
+    else {
+      for (const p of prApprovals) {
+        const ok = await verifyRecordedApproval(api, p.approval.approved_via!, p.approver, p.contentPath, p.approval.content_hash, p.hashOf);
+        if (ok === true) console.log(`  ✓ ${p.what}: ${p.approver} approved ${p.approval.approved_via}`);
+        else r.err(p.file, `${p.what}: ${ok}`);
+      }
+    }
   }
 
   r.summary();

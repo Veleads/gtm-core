@@ -10,11 +10,18 @@ export const ProjectFile = z.object({
   status: z.enum(["onboarding", "active", "paused", "closed"]),
   started_at: IsoDate,
   owners: z.object({
-    gtm_engineer: z.string().min(1),
-    sdrs: z.array(z.string().min(1)),
-    approver: z.string().min(1).describe("Person who signs off ICP and copy for this project"),
+    gtm_engineer: z.string().min(1).describe("GitHub handle (@user) or name"),
+    sdrs: z.array(z.string().min(1)).describe("GitHub handles (@user) or names"),
+    approver: z
+      .string()
+      .min(1)
+      .describe("Signs off ICP and copy. A GitHub handle (@user) makes approvals PR reviews enforced by GitHub; a name records them by name"),
   }),
   regions: z.array(z.string().min(2)).min(1).describe("Target regions, e.g. EU, UK, US"),
   features: z.record(z.string(), z.boolean()).default({}).describe("Opt-in core features, see FEATURES"),
+  tracker: z
+    .object({ kind: z.enum(["github", "none"]) })
+    .default({ kind: "none" })
+    .describe("Where `gtm track` mirrors stages and gates. Git files stay the source of truth"),
 });
 export type ProjectFile = z.infer<typeof ProjectFile>;

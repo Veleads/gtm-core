@@ -22,3 +22,7 @@ npx gtm validate
 ## Core upgrades
 A weekly workflow opens a PR when a new core is released (`.github/workflows/gtm-upgrade.yml`).
 Manually: `npx gtm upgrade` (refuses while a campaign is between QA and launch).
+
+## GitHub
+Approvals and tracking run through GitHub: see `.gtm/guides/github.md` (owners as `@handles`,
+`npx gtm github setup --apply`, PR-based sign-off, the org-wide board).

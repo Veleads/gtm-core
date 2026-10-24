@@ -12,6 +12,10 @@ export const Domain = z
 
 export const Tier = z.enum(["A", "B", "C"]);
 
+/** A GitHub user handle, e.g. "@abdullah". Owners given as handles get GitHub-enforced approvals. */
+export const GitHubHandle = z.string().regex(/^@[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/, "GitHub handle like @username");
+export const isGitHubHandle = (value: string | null | undefined): value is string => !!value && GitHubHandle.safeParse(value).success;
+
 export const Stage = z.enum([
   "intake",
   "icp",
@@ -44,6 +48,11 @@ export const Approval = z
       .regex(/^sha256:[0-9a-f]{16}$/)
       .optional()
       .describe("Fingerprint of the approved content, written by `gtm approve`. Never edit by hand."),
+    approved_via: z
+      .string()
+      .url()
+      .optional()
+      .describe("Pull request whose review is the approval (GitHub mode). Written by `gtm approve --pr`."),
   })
   .refine(
     (a) => a.status !== "approved" || (a.approved_by !== null && a.approved_at !== null),

@@ -9,31 +9,47 @@ description: Stage 0 of the gtm-brain process. Sets up a new project. Captures w
 Collect everything later stages need, once, in files, so no one has to re-ask the stakeholders.
 
 ## Inputs
-- Kickoff call notes, sales deck, website, CRM access (provided by the human).
-- `context/intake.md` (scaffolded from the core template by `gtm init`).
+- The business website (from `project.yaml` → `name`, or ask for the URL).
+- `context/intake.md` (scaffolded by `gtm init`), the `research` skill, stakeholder answers.
 
 ## Steps
 1. If the project repo does not exist yet, a GTM engineer creates it: an empty **private** repo, cloned,
    then `npx @veleads/gtm init . --name "<Name>"` inside it (keeps `.git` and README).
-2. Fill `project.yaml`: owners (GTM engineer, SDRs, **project approver**), regions, status `onboarding`.
-3. Walk the questionnaire in `context/intake.md` with the human. For each answer, write what the
-   stakeholders said, not your interpretation. Unknown → write `unknown` and add it to open questions.
-4. Fill the access checklist. Each row gets an owner and a status. Never write credentials or
-   API keys into the file; only "received / stored in secret manager".
-5. Suppression inputs (customers, open deals, do-not-contact, recently contacted) are collected as
-   **files outside git**. Note in the checklist that they were received and when; loading them is a
-   job (`suppression:import`, see AGENTS.md section 7).
-6. Write a first draft of `voice.md` and `proof.md` from what the stakeholders gave you (proof items
-   default to "approved for outbound: no" until the approver confirms).
-7. Run `npx gtm validate`. Template TODOs in icp/signals yaml are expected at this point.
+2. **Research first.** Run `.gtm/skills/research/SKILL.md` → `context/research.md`. Do not ask the
+   human anything research can answer.
+3. **Draft `context/intake.md` from research.** Fill every field you can; mark each one
+   `(researched: <source>; confirm)`. Fields only stakeholders know stay `(needs you)`.
+4. **Ask only the `(needs you)` fields**, as one short numbered list. For each: one plain sentence on
+   what it means and why it matters, plus an example answer (use the examples in `intake.md`). Ask
+   people to confirm or correct the researched fields in the same message.
+5. **Owners in `project.yaml`:** GitHub handles (`@user`) for the GTM engineer, SDRs and approver.
+   An approver handle makes ICP/copy sign-off a PR review that GitHub enforces; use a plain name only
+   if the approver isn't on GitHub. If there is no separate SDR or approver, the same person can hold
+   several roles, but **GitHub never lets someone approve a PR they opened**: with one person, either
+   the agent opens PRs from another account, or record approvals by name (approver = their name).
+6. Write answers as the stakeholders gave them, not your interpretation. Unknown → `unknown` and an
+   open question.
+7. Fill the access checklist (owner + status per row). Never write credentials into files; only
+   "received / stored in secret manager".
+8. Suppression inputs (customers, open deals, do-not-contact, recently contacted) are **files outside
+   git**. Use research's customer list as a starting point and ask for the real lists; loading them is
+   a job (`suppression:import`, AGENTS.md section 7).
+9. Draft `voice.md` and `proof.md` from research and answers (proof items default to "approved for
+   outbound: no" until the approver confirms).
+10. If `tracker.kind` is `github`, run `npx gtm github setup` (plan) and ask the GTM engineer to run
+    it with `--apply`; then `npx gtm sync` to write CODEOWNERS.
+11. Run `npx gtm validate`. Template TODOs in icp/signals yaml are expected at this point.
 
 ## Outputs
-- `project.yaml`, `context/intake.md` complete; draft `voice.md`, `proof.md`.
+- `context/research.md`; `project.yaml` (owners as GitHub handles), `context/intake.md` complete
+  with every field marked researched/confirmed; draft `voice.md`, `proof.md`.
 - Run log in the first campaign's `runs/` if one exists, otherwise the commit message documents it.
 
 ## Checklist
+- [ ] Research done first; every researched field confirmed by a stakeholder
+- [ ] Only questions research couldn't answer were asked, each with an example
 - [ ] Goal and meeting definition are numbers, not adjectives
-- [ ] Project approver named in `project.yaml`
+- [ ] Owners in `project.yaml` (GitHub handles where possible); approver is not the PR author
 - [ ] Every access checklist row has owner + status
 - [ ] Regions set (drives compliance at QA)
 - [ ] No secrets, no contact lists in the repo

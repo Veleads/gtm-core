@@ -31,6 +31,8 @@ node -e "
 echo "• fresh repo is in sync"
 npx gtm sync --check
 
+test -f context/research.md || { echo "init must create context/research.md"; exit 1; }
+
 echo "• fresh repo validates (TODO warnings only)"
 npx gtm validate | tail -1
 
@@ -51,6 +53,25 @@ npx gtm validate | tail -1
 perl -pi -e 's/day 9 to day 4/day 9 to day 3/' campaigns/uk-mfg-hiring/copy.md
 if npx gtm validate >/dev/null; then echo "expected validate to fail after copy change"; exit 1; fi
 npx gtm approve copy uk-mfg-hiring --by "E2E Approver (QA)" >/dev/null
+npx gtm validate | tail -1
+
+echo "• tracker none mirrors nothing; gate-done follows the files"
+npx gtm track stage uk-mfg-hiring | grep -q "tracker none" || { echo "expected tracker none to skip"; exit 1; }
+npx gtm track gate-done icp | grep -q "skipped" || { echo "expected gate-done to pass for the approved ICP"; exit 1; }
+perl -pi -e 's/^(\s+)status: approved/$1status: pending/' context/icp.yaml
+if npx gtm track gate-done icp >/dev/null 2>&1; then echo "gate-done must refuse an unapproved gate"; exit 1; fi
+git checkout -q -- context/icp.yaml 2>/dev/null || perl -pi -e 's/^(\s+)status: pending/$1status: approved/' context/icp.yaml
+
+echo "• GitHub approver: by-name approvals rejected, --pr required, CODEOWNERS block written"
+cp project.yaml "$WORK/project.yaml.bak"
+perl -pi -e 's/^  approver: .*/  approver: "\@maria-e2e"/' project.yaml
+if npx gtm validate >/dev/null; then echo "expected validate to require PR approvals in GitHub mode"; exit 1; fi
+out=$(npx gtm validate || true)
+echo "$out" | grep -q "GitHub mode" || { echo "expected a GitHub mode error"; exit 1; }
+if npx gtm approve icp --by "Someone (role)" >/dev/null 2>&1; then echo "expected approve to require --pr in GitHub mode"; exit 1; fi
+npx gtm sync >/dev/null && grep -q "^/context/icp.yaml @maria-e2e" .github/CODEOWNERS || { echo "CODEOWNERS block missing"; exit 1; }
+cp "$WORK/project.yaml.bak" project.yaml && npx gtm sync >/dev/null
+if grep -q "maria-e2e" .github/CODEOWNERS 2>/dev/null; then echo "CODEOWNERS block must go with a named approver"; exit 1; fi
 npx gtm validate | tail -1
 
 echo "• hand-edited core file is caught"
