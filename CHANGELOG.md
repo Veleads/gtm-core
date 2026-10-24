@@ -4,6 +4,8 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+
+## [0.3.0] - 2026-10-24
 - **migration** "Clients" are now **projects**: one private repo = one project.
   `client.yaml` → `project.yaml`, `CLIENT.md` → `PROJECT.md`, `client_id` → `project_id` in every YAML
   file (all kinds now version 2), `owners.client_approver` → `owners.approver`, project status
