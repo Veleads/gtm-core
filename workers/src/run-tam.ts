@@ -1,10 +1,11 @@
 // TAM build: page accounts from the account source per ICP segment, drop exclusions, bulk-upsert into
-// `accounts` (idempotent on project + tam + domain), and compute the funnel TAM → reachable → active.
+// `accounts` (idempotent on tam + domain), and compute the funnel TAM → reachable → active.
 // Pure orchestration over injected db + registry, so it runs in Hatchet or in a test the same way.
 import { BudgetExceededError, CostTracker, ProviderRegistry, type RunContext } from "@gtm/core";
 import type { Db } from "@gtm/db";
 import { TamJobInput, type TamJobResult } from "@gtm/schemas";
 import { PrismaCostSink } from "./cost-sink.ts";
+import { bindProject } from "./project-binding.ts";
 
 const CHUNK = 1000;
 
@@ -19,15 +20,15 @@ async function upsertAccounts(db: Db, ctx: RunContext, tamId: string, segmentId:
   for (let i = 0; i < rows.length; i += CHUNK) {
     const json = JSON.stringify(rows.slice(i, i + CHUNK));
     const res = await db.$queryRaw<{ inserted: boolean }[]>`
-      INSERT INTO accounts (project_id, campaign_id, run_id, tam_id, segment_id, domain, name, linkedin_url, industry,
+      INSERT INTO accounts (campaign_id, run_id, tam_id, segment_id, domain, name, linkedin_url, industry,
                             employee_count, revenue_usd, hq_country, technologies, reachable, field_sources)
-      SELECT ${ctx.projectId}, ${ctx.campaignId}, ${ctx.runId}::uuid, ${tamId}, ${segmentId}, r.domain, r.name, r.linkedin_url,
+      SELECT ${ctx.campaignId}, ${ctx.runId}::uuid, ${tamId}, ${segmentId}, r.domain, r.name, r.linkedin_url,
              r.industry, r.employee_count, r.revenue_usd, r.hq_country,
              ARRAY(SELECT jsonb_array_elements_text(COALESCE(r.technologies, '[]'::jsonb))), r.reachable,
              COALESCE(r.field_sources, '{}'::jsonb)
       FROM jsonb_to_recordset(${json}::jsonb) AS r(domain text, name text, linkedin_url text, industry text,
            employee_count int, revenue_usd bigint, hq_country text, technologies jsonb, reachable boolean, field_sources jsonb)
-      ON CONFLICT (project_id, tam_id, domain) DO UPDATE SET
+      ON CONFLICT (tam_id, domain) DO UPDATE SET
         segment_id = EXCLUDED.segment_id, name = EXCLUDED.name, linkedin_url = EXCLUDED.linkedin_url,
         industry = EXCLUDED.industry, employee_count = EXCLUDED.employee_count, revenue_usd = EXCLUDED.revenue_usd,
         hq_country = EXCLUDED.hq_country, technologies = EXCLUDED.technologies, reachable = EXCLUDED.reachable,
@@ -38,14 +39,14 @@ async function upsertAccounts(db: Db, ctx: RunContext, tamId: string, segmentId:
   return inserted;
 }
 
-/** Reachable accounts of a segment that no active suppression entry covers (project-wide or this campaign). */
+/** Reachable accounts of a segment that no active suppression entry covers (all campaigns or this one). */
 async function countActive(db: Db, ctx: RunContext, tamId: string, segmentId: string): Promise<number> {
   const [row] = await db.$queryRaw<{ n: bigint }[]>`
     SELECT count(*) AS n FROM accounts a
-    WHERE a.project_id = ${ctx.projectId} AND a.tam_id = ${tamId} AND a.segment_id = ${segmentId} AND a.reachable IS TRUE
+    WHERE a.tam_id = ${tamId} AND a.segment_id = ${segmentId} AND a.reachable IS TRUE
       AND NOT EXISTS (
         SELECT 1 FROM suppression s
-        WHERE s.project_id = a.project_id AND s.domain = a.domain
+        WHERE s.domain = a.domain
           AND (s.campaign_id IS NULL OR s.campaign_id = ${ctx.campaignId})
           AND (s.expires_at IS NULL OR s.expires_at > now()))`;
   return Number(row?.n ?? 0);
@@ -54,14 +55,15 @@ async function countActive(db: Db, ctx: RunContext, tamId: string, segmentId: st
 export async function runTam(db: Db, registry: ProviderRegistry, rawInput: unknown): Promise<TamJobResult> {
   const input = TamJobInput.parse(rawInput);
   const c = input.ctx;
+  await bindProject(db, c.project_id);
   const run = await db.run.create({
     data: {
-      projectId: c.project_id, campaignId: c.campaign_id, stage: "tam", job: "tam", status: "running", triggeredBy: c.triggered_by,
+      campaignId: c.campaign_id, stage: "tam", job: "tam", status: "running", triggeredBy: c.triggered_by,
       gitSha: c.git_sha, configHash: c.config_hash, startedAt: new Date(),
       params: { tam_id: input.tam_id, source: input.source, segments: input.segments.map((s) => s.id), core_version: c.core_version },
     },
   });
-  const ctx: RunContext = { projectId: c.project_id, campaignId: c.campaign_id, runId: run.id, triggeredBy: c.triggered_by };
+  const ctx: RunContext = { campaignId: c.campaign_id, runId: run.id, triggeredBy: c.triggered_by };
 
   try {
     const source = registry.accountSource(input.source);
@@ -104,7 +106,7 @@ export async function runTam(db: Db, registry: ProviderRegistry, rawInput: unkno
       });
     }
 
-    const where = { projectId: c.project_id, tamId: input.tam_id };
+    const where = { tamId: input.tam_id };
     const totals = {
       tam: await db.account.count({ where }),
       reachable: await db.account.count({ where: { ...where, reachable: true } }),

@@ -40,13 +40,13 @@ async function cachedCall<T>(
   call: () => Promise<{ data: T | null; raw: unknown; cost: Parameters<CostTracker["record"]>[0] }>,
 ): Promise<{ data: T | null; cached: boolean }> {
   const key = inputKey(input);
-  const hit = await opts.cache.get<T>(ctx.projectId, adapter.slug, operation, key);
+  const hit = await opts.cache.get<T>(adapter.slug, operation, key);
   if (hit) return { data: hit.data, cached: true };
 
   opts.costs.reserve(adapter.estimateCostUsd(operation));
   const res = await call();
   await opts.costs.record(res.cost);
-  await opts.cache.put(ctx.projectId, adapter.slug, operation, key, { data: res.data, raw: res.raw, fetchedAt: new Date().toISOString() }, opts.cacheTtlDays);
+  await opts.cache.put(adapter.slug, operation, key, { data: res.data, raw: res.raw, fetchedAt: new Date().toISOString() }, opts.cacheTtlDays);
   return { data: res.data, cached: false };
 }
 

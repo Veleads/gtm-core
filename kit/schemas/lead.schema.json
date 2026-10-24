@@ -2,10 +2,6 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
-    "project_id": {
-      "type": "string",
-      "pattern": "^[a-z0-9][a-z0-9-]*$"
-    },
     "campaign_id": {
       "type": "string",
       "pattern": "^[a-z0-9][a-z0-9-]*$"
@@ -114,7 +110,6 @@
     }
   },
   "required": [
-    "project_id",
     "campaign_id",
     "run_id",
     "email",

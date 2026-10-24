@@ -3,6 +3,10 @@
 Hatchet workers that execute gtm jobs. They wrap `packages/core` (adapters, cost tracker) and write to
 Postgres through `@gtm/db`. **Available: `tam`.** Planned below.
 
+**One database per project.** Each project runs its own stack (Postgres + Hatchet + workers), and rows
+carry no `project_id`. Every job first binds the database to the payload's `project_id` (single-row
+`project` table) and is refused if the database already belongs to another project.
+
 ## Run locally (local stack v0)
 ```bash
 pnpm stack:up     # Postgres + hatchet-lite, gtm migrations, Hatchet token → ~/.gtm/stack.env

@@ -2,7 +2,7 @@ import type { Account, IcpSegment } from "@gtm/schemas";
 import type { AdapterResult, ProviderAdapter, RunContext } from "../types.ts";
 
 export interface AccountPage {
-  accounts: Omit<Account, "project_id" | "tam_id">[];
+  accounts: Omit<Account, "tam_id">[];
   nextCursor: string | null;
 }
 

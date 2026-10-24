@@ -1,6 +1,8 @@
-/** Every job runs inside a RunContext. Every DB row and cost entry carries these ids. */
+/**
+ * Every job runs inside a RunContext. Every DB row and cost entry carries these ids. There is no
+ * project id: each project has its own database, so the database is the project scope.
+ */
 export interface RunContext {
-  projectId: string;
   campaignId: string | null;
   runId: string;
   triggeredBy: string;

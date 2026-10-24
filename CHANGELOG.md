@@ -4,6 +4,16 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+- **action** One database per project: each project repo runs its own stack (Postgres + Hatchet +
+  workers) and core holds no project state. Rows no longer carry `project_id`; unique keys are now
+  per database (`accounts` on `tam_id` + `domain`, `contacts` on `linkedin_url`, …). A new
+  single-row `project` table binds the database to one `project_id` on the first job, and workers
+  refuse jobs for any other project. The `account`, `contact`, `lead` and `signal` schemas drop
+  `project_id`; `project.yaml` and job payloads keep it. DB migration
+  `20261025000000_database_per_project` binds an existing single-project database automatically and
+  **refuses to run on a database that holds more than one project**: give each project its own
+  database (copy its rows, filtered by `project_id`) before upgrading. Point each project's
+  `DATABASE_URL` at its own database.
 
 ## [0.6.0] - 2026-10-24
 - **no action** Layered ICP: `context/icp.yaml` can have an optional `core.firmographics` that every

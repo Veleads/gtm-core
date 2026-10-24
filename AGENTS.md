@@ -17,7 +17,7 @@ for people and agents changing the core.**
 | `packages/cli` | yes, as the `gtm` binary in `@veleads/gtm` | init, sync, validate, migrate, upgrade, status, job |
 | `packages/schemas` | bundled into the CLI | Zod schemas, file versions, features, migrations |
 | `packages/core` | no (used by workers) | adapter interfaces, waterfall, cost tracker |
-| `workers/`, `db/` | no (deployed centrally) | Hatchet workflows; Postgres via Prisma (`db/prisma/schema.prisma`) |
+| `workers/`, `db/` | no (each project runs its own stack: Postgres + Hatchet + workers) | Hatchet workflows; Postgres via Prisma (`db/prisma/schema.prisma`) |
 | `examples/northwind/` | no | fictional project repo used as a test fixture |
 
 Project repos receive core only through releases.
@@ -29,7 +29,8 @@ obvious cases; reviewers catch the rest. Project repos are always private.
 
 ## 2. Compatibility contract (read before changing anything)
 
-Project repos upgrade on their own schedule, but **all of them run on the same deployed workers**. So:
+Project repos upgrade on their own schedule. **Each project has its own stack and database; core holds no
+project state** (one repo = one project = one database). So:
 
 1. **Project-owned YAML** (`project.yaml`, `context/icp.yaml`, `context/signals.yaml`,
    `campaigns/*/config.yaml`) has a `version:` per file kind (`packages/schemas/src/versions.ts`).
@@ -37,13 +38,18 @@ Project repos upgrade on their own schedule, but **all of them run on the same d
    `packages/schemas/src/migrations.ts` with a test. `gtm migrate` applies it in project repos,
    preserving comments. Never edit a released migration.
 3. **Workers accept the current and the previous version** of every file kind until the next major
-   release. Job payloads carry the project repo's core version so workers can tell.
+   release, because a project's workers and its repo can be on different core versions during an
+   upgrade. Job payloads carry the project repo's core version so workers can tell.
 4. **New behaviour that changes outcomes** (scoring, copy rules, new channels) ships behind a feature
    flag in `packages/schemas/src/features.ts`, default off; it may become default only in a major.
 5. **Playbook changes** (`kit/skills`, `kit/AGENTS.md`) reach projects on upgrade. Additive changes are
    minor; removing or reordering steps, or changing a gate, is major.
 6. Project repos never edit `.gtm/` or `AGENTS.md` (CI enforces `gtm sync --check`). Project-specific
    rules belong in their `PROJECT.md`, which may only add constraints.
+7. **One database per project.** Rows carry no `project_id`: the database is the project scope. Its
+   single-row `project` table binds it to one `project_id` on the first job, and workers refuse jobs
+   for any other project. Never point two projects at one database. Within a project, `tam_id`,
+   `campaign_id` and `run_id` still scope rows.
 
 ## 3. Versioning and releases
 

@@ -7,13 +7,12 @@ export interface CachedResponse<T = unknown> {
 }
 
 /**
- * Raw provider responses keyed by (project, provider, operation, inputKey). Backed by the
+ * Raw provider responses keyed by (provider, operation, inputKey), in the project's own database. Backed by the
  * `enrichments` table in Phase 2. Makes every job idempotent: re-running never re-pays.
  */
 export interface EnrichmentCache {
-  get<T>(projectId: string, provider: string, operation: string, inputKey: string): Promise<CachedResponse<T> | null>;
+  get<T>(provider: string, operation: string, inputKey: string): Promise<CachedResponse<T> | null>;
   put<T>(
-    projectId: string,
     provider: string,
     operation: string,
     inputKey: string,
