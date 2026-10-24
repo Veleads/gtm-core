@@ -4,6 +4,8 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+
+## [0.4.0] - 2026-10-24
 - **no action** `gtm init . --name "<Name>"` sets up the current folder instead of creating a
   subfolder (slug from the folder name, e.g. `gtm-project-acme` → `acme`, or `--slug`). Built for a
   freshly cloned repo: `.git` is kept (no `git init` inside an existing repository), `README.md` is
