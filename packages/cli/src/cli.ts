@@ -8,6 +8,7 @@ import { runInit } from "./commands/init.ts";
 import { runJob } from "./commands/job.ts";
 import { runMigrate } from "./commands/migrate.ts";
 import { runNewCampaign } from "./commands/new-campaign.ts";
+import { runStack } from "./commands/stack.ts";
 import { runStatus } from "./commands/status.ts";
 import { runSync } from "./commands/sync.ts";
 import { runUpgrade } from "./commands/upgrade.ts";
@@ -32,6 +33,7 @@ const { values, positionals } = parseArgs({
     check: { type: "boolean" },
     "dry-run": { type: "boolean" },
     force: { type: "boolean" },
+    wipe: { type: "boolean" },
     help: { type: "boolean", short: "h" },
     version: { type: "boolean", short: "v" },
   },
@@ -66,6 +68,7 @@ async function run(): Promise<boolean> {
     case "migrate": return runMigrate(root, { dryRun: values["dry-run"] });
     case "upgrade": return runUpgrade(root, { version: args[0], force: values.force });
     case "job": return runJob(root, args);
+    case "stack": return runStack(root, args, { wipe: values.wipe });
     case undefined: return help(undefined);
     case "help": return help(args[0]);
     default: console.error(`Unknown command "${command}"\n\n${generalHelp(GTM_VERSION)}`); return false;

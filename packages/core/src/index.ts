@@ -9,4 +9,5 @@ export type * from "./adapters/verify.ts";
 export type * from "./adapters/signals.ts";
 export type * from "./adapters/sender.ts";
 export * from "./stack-env.ts";
+export * from "./local-stack.ts";
 export { MockAccountSource } from "./adapters/mock-account-source.ts";

@@ -129,6 +129,7 @@ Rules, no exceptions:
 - Bounce rate > 3% or spam complaints in results: recommend pausing; the human decides.
 - Anything that would contact a real person outside a launch that passed all three gates.
 - You are about to edit `AGENTS.md` or anything in `.gtm/`.
+- You are about to run `npx gtm stack down --wipe`: it deletes this project's database. Only on the human's request.
 
 ## 5. Data rules
 
@@ -140,7 +141,8 @@ Rules, no exceptions:
 3. QA sample review happens in the DB console or terminal output. Do not paste sampled rows into files
    or PR descriptions; summarize ("19/20 correct persona").
 4. **Secrets** live only in `.env` (git-ignored) or the secret manager. Never print, echo, commit or
-   paste keys. Provider API keys never live in a project repo: they are on this project's workers.
+   paste keys. Provider API keys never live in a project repo: they are on this project's workers (local stack:
+   `~/.gtm/stacks/<project_id>.secrets.env`, written by the human).
 5. Every DB row carries `campaign_id`, `run_id` and timestamps (the database itself is the project scope).
    Every job prints its `run_id`.
 6. Every lead field records its source (`field_sources`) so GDPR "where did you get my data?" can be answered.
@@ -180,6 +182,8 @@ Run from the repo root. If you cannot run shell commands, give the exact command
 | `npx gtm sync [--check]` | re-copy core kit into `.gtm/` and `AGENTS.md` | available |
 | `npx gtm migrate [--dry-run]` | rewrite YAML files to the installed core's schema versions | available |
 | `npx gtm upgrade [version]` | install a newer core, sync, migrate, validate, show changelog | available |
+| `npx gtm stack up` / `npx gtm stack status` | start / check this project's own stack (Postgres + Hatchet + worker at this core version) on Docker; jobs need it | available |
+| `npx gtm stack down [--wipe]` | stop the stack, data kept; `--wipe` deletes this project's database (only when the human asks) | available |
 | `npx gtm job tam <campaign>` | build TAM into `accounts` (via the workers), print funnel counts, cost, run_id and a run-log row | available |
 | `npx gtm job enrich <campaign>` | find people + email waterfall + verification, cost-capped | planned |
 | `npx gtm job suppression:import <campaign> <file>` | load suppression lists (file stays outside git) | planned |
@@ -205,7 +209,8 @@ Every job prints a `run_id`, counts and cost. Copy those into the run log.
 
 - **New project:** create an empty **private** repo (e.g. `<org>/gtm-project-<slug>`), clone it, and in
   that folder run `npx @veleads/gtm init . --name "<Name>"` (or `init <slug>` to create a new folder).
-  Commit, push, then stage `00-intake` begins.
+  Commit, push, then stage `00-intake` begins. Before the first job (stage 2), start the project's stack
+  with `npx gtm stack up` (needs Docker).
 - **New campaign:** from up-to-date `main`: `git switch -c campaign/<slug>`,
   `npx gtm new-campaign <slug>`, fill `brief.md`, set `stage`, follow the routing table.
 - **New SDR:** read this file and `PROJECT.md`, run `npx gtm status`, then section 2 with a GTM engineer watching.

@@ -22,8 +22,9 @@ Know how big the market is, and whether the ICP filters are right, before spendi
 4. Trigger the job: `npx gtm job tam <campaign>`. It validates, sends segment filters and exclusions
    from `icp.yaml` to the workers, which page accounts through the adapter, upsert them into
    `accounts` (re-runs update, never duplicate) and print counts per segment plus a run-log row.
-   **You do not page through accounts yourself.** If it says there is no Hatchet connection or keeps
-   waiting for a worker, stop and tell the human (AGENTS.md section 4).
+   **You do not page through accounts yourself.** If it says there is no Hatchet connection, run
+   `npx gtm stack up` once (needs Docker). If that fails, or the job keeps waiting for a worker
+   (`npx gtm stack status`), stop and tell the human (AGENTS.md section 4).
 5. Funnel counts per segment (printed by the job):
    - **TAM**: accounts matching filters.
    - **Reachable**: accounts where at least one target persona can be found (from the job's

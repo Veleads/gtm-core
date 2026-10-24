@@ -7,7 +7,13 @@ Postgres through `@gtm/db`. **Available: `tam`.** Planned below.
 carry no `project_id`. Every job first binds the database to the payload's `project_id` (single-row
 `project` table) and is refused if the database already belongs to another project.
 
-## Run locally (local stack v0)
+## In a project repo
+`npx gtm stack up` starts that project's stack from `kit/stack/docker-compose.yml`: Postgres, hatchet-lite
+and this worker as the image `ghcr.io/veleads/gtm-worker:<core version>` (built from `workers/Dockerfile`,
+published by `release.yml`). The container applies database migrations, then registers the jobs.
+Provider keys reach it from `~/.gtm/stacks/<project_id>.secrets.env`.
+
+## Run locally from source (core development)
 ```bash
 pnpm stack:up     # Postgres + hatchet-lite, gtm migrations, Hatchet token → ~/.gtm/stack.env
 pnpm worker       # this worker, on your machine (connects using ~/.gtm/stack.env)

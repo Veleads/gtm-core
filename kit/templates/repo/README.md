@@ -10,6 +10,7 @@ npm install          # or: pnpm install / yarn install
 cp .env.example .env
 npx gtm status
 npx gtm validate
+npx gtm stack up     # this project's own stack (needs Docker); jobs run on it
 ```
 
 ## What lives where
