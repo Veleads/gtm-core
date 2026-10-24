@@ -17,19 +17,23 @@ Know how big the market is, and whether the ICP filters are right, before spendi
 1. Confirm the ICP gate is approved. If not, stop and go back to `01-icp`.
 2. Set `tam_id` in `config.yaml` (`<project>-tam-<YYYYqN>` or similar). Reuse an existing `tam_id`
    if the same project already has a TAM built from the same approved ICP.
-3. Trigger the job: `npx gtm job tam <campaign>`. It reads segment filters from `icp.yaml`,
-   pulls accounts through the configured account-source adapter, writes them to `accounts`, and
-   prints counts per segment. **You do not page through accounts yourself.**
-4. Funnel counts per segment:
+3. Set `config.yaml` → `tam.source` (the account source adapter; `mock-accounts` generates fictional
+   accounts to prove the pipeline, never for a real campaign) and `tam.max_accounts_per_segment`.
+4. Trigger the job: `npx gtm job tam <campaign>`. It validates, sends segment filters and exclusions
+   from `icp.yaml` to the workers, which page accounts through the adapter, upsert them into
+   `accounts` (re-runs update, never duplicate) and print counts per segment plus a run-log row.
+   **You do not page through accounts yourself.** If it says there is no Hatchet connection or keeps
+   waiting for a worker, stop and tell the human (AGENTS.md section 4).
+5. Funnel counts per segment (printed by the job):
    - **TAM**: accounts matching filters.
    - **Reachable**: accounts where at least one target persona can be found (from the job's
      persona count, or a sample-based estimate marked as an estimate).
    - **Active segment**: reachable minus exclusions and suppression.
-5. Sanity check: compare against the expected range. Spot-check 20 random accounts in the DB console
+6. Sanity check: compare against the expected range. Spot-check 20 random accounts in the DB console
    (name, industry, size); count how many are clearly ICP. Do not paste the rows anywhere.
-6. If the spot check finds a pattern of bad matches, propose an `icp.yaml` filter change. That
+7. If the spot check finds a pattern of bad matches, propose an `icp.yaml` filter change. That
    change resets the ICP gate, so present it to the human first.
-7. Write `tam/<tam_id>.md` from `.gtm/templates/outputs/tam-summary.md` and the run log.
+8. Write `tam/<tam_id>.md` from `.gtm/templates/outputs/tam-summary.md` and the run log.
 
 ## Outputs
 - Rows in `accounts` (Postgres), tagged `project_id`, `tam_id`, `run_id`.

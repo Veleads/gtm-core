@@ -14,6 +14,11 @@ const Enrichment = z.object({
   cache_ttl_days: z.number().int().positive(),
 });
 
+const Tam = z.object({
+  source: Slug.describe("Account source adapter (mock-accounts for local proofs; real providers in .gtm/providers/)"),
+  max_accounts_per_segment: z.number().int().positive().max(100_000).default(500),
+});
+
 const Budget = z.object({
   currency: z.literal("USD"),
   max_total: z.number().positive().describe("Hard cap for this campaign; jobs stop when reached"),
@@ -67,6 +72,7 @@ export const CampaignConfig = z
     owner: z.string().min(1),
     stage: Stage.describe("The stage currently being worked on"),
     tam_id: Slug,
+    tam: Tam.optional().describe("How `gtm job tam` builds the TAM"),
     segments: z.array(Slug).min(1).describe("Segment ids from icp.yaml"),
     personas: z.array(Slug).min(1).describe("Persona ids from icp.yaml"),
     enrichment: Enrichment,

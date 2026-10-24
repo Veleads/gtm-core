@@ -25,6 +25,8 @@
     "packages/*/scripts",
     "packages/*/tsup.config.ts",
     "db/src",
-    "db/prisma.config.ts"
+    "db/prisma.config.ts",
+    "workers/src",
+    "scripts"
   ]
 }
