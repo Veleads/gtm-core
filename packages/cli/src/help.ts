@@ -27,7 +27,7 @@ export const COMMANDS: Record<string, CommandHelp> = {
     summary: "scaffold campaigns/<slug>/",
     details: ["Copies the campaign template (brief.md, config.yaml, copy.md, runs/). Owner comes from GTM_USER."],
     writes: "campaigns/<slug>/ (refuses if it exists).",
-    examples: ["git switch -c campaign/q1-uk-cfo && pnpm gtm new-campaign q1-uk-cfo"],
+    examples: ["git switch -c campaign/q1-uk-cfo && npx gtm new-campaign q1-uk-cfo"],
   },
   validate: {
     usage: "gtm validate [campaign]",
@@ -39,14 +39,14 @@ export const COMMANDS: Record<string, CommandHelp> = {
       "Exit code 1 if there is any error; warnings never fail.",
     ],
     writes: "Nothing (read-only).",
-    examples: ["pnpm gtm validate", "pnpm gtm validate q1-uk-cfo"],
+    examples: ["npx gtm validate", "npx gtm validate q1-uk-cfo"],
   },
   status: {
     usage: "gtm status",
     summary: "campaigns, stages, gates",
     details: ["One screen: project, core version, ICP gate, and per campaign the stage, copy/launch gates, owner and latest run log."],
     writes: "Nothing (read-only).",
-    examples: ["pnpm gtm status"],
+    examples: ["npx gtm status"],
   },
   approve: {
     usage: 'gtm approve icp --by "<Name (role)>" [--notes ".."] [--date YYYY-MM-DD]\ngtm approve copy <campaign> --by "<Name (role)>" [--notes ".."] [--date YYYY-MM-DD]',
@@ -58,7 +58,7 @@ export const COMMANDS: Record<string, CommandHelp> = {
       "The launch gate is recorded by hand in config.yaml (its content is the lead set).",
     ],
     writes: "context/icp.yaml → approval (icp), or campaigns/<campaign>/config.yaml → gates.copy (copy).",
-    examples: ['pnpm gtm approve icp --by "Maria Chen (VP Marketing)" --notes "Segments A+B, personas CFO+AP"', 'pnpm gtm approve copy q1-uk-cfo --by "Maria Chen (VP Marketing)"'],
+    examples: ['npx gtm approve icp --by "Maria Chen (VP Marketing)" --notes "Segments A+B, personas CFO+AP"', 'npx gtm approve copy q1-uk-cfo --by "Maria Chen (VP Marketing)"'],
   },
   sync: {
     usage: "gtm sync [--check]",
@@ -68,14 +68,14 @@ export const COMMANDS: Record<string, CommandHelp> = {
       "--check only compares and exits 1 if they differ (CI uses this; never edit .gtm/ by hand).",
     ],
     writes: ".gtm/ (replaced entirely) and AGENTS.md; creates CLAUDE.md if missing. With --check: nothing.",
-    examples: ["pnpm gtm sync", "pnpm gtm sync --check"],
+    examples: ["npx gtm sync", "npx gtm sync --check"],
   },
   migrate: {
     usage: "gtm migrate [--dry-run]",
     summary: "upgrade YAML files to current schema versions",
     details: ["Applies core schema migrations to project.yaml, context/*.yaml and campaigns/*/config.yaml, keeping comments."],
     writes: "Those YAML files, only if a migration applies. With --dry-run: nothing.",
-    examples: ["pnpm gtm migrate --dry-run", "pnpm gtm migrate"],
+    examples: ["npx gtm migrate --dry-run", "npx gtm migrate"],
   },
   upgrade: {
     usage: "gtm upgrade [version] [--force]",
@@ -85,7 +85,7 @@ export const COMMANDS: Record<string, CommandHelp> = {
       "Refuses while a campaign is in qa or launch, or with uncommitted changes (--force overrides; ask a GTM engineer).",
     ],
     writes: "package.json, lockfile, node_modules, .gtm/, AGENTS.md and migrated YAML files.",
-    examples: ["pnpm gtm upgrade", "pnpm gtm upgrade 0.3.0"],
+    examples: ["npx gtm upgrade", "npx gtm upgrade 0.3.0"],
   },
   job: {
     usage: "gtm job <name> <campaign>",
@@ -95,7 +95,7 @@ export const COMMANDS: Record<string, CommandHelp> = {
       "Not available yet: it exits 1. Per AGENTS.md this is a stop; do not improvise jobs with ad-hoc scripts.",
     ],
     writes: "Nothing yet.",
-    examples: ["pnpm gtm job tam q1-uk-cfo"],
+    examples: ["npx gtm job tam q1-uk-cfo"],
   },
 };
 
@@ -104,7 +104,7 @@ export function generalHelp(version: string): string {
   const lines = Object.entries(COMMANDS).map(([name, c]) => `  ${name.padEnd(width)}  ${c.summary}`);
   return `gtm v${version}: CLI for gtm-brain project repos (@veleads/gtm)
 
-Usage: gtm <command> [options]      (inside a project repo: pnpm gtm <command>)
+Usage: gtm <command> [options]      (inside a project repo: npx gtm <command>)
 
 Commands:
 ${lines.join("\n")}

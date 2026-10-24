@@ -57,7 +57,7 @@ Project repos upgrade on their own schedule, but **all of them run on the same d
 - Release: move Unreleased to `## [x.y.z] - YYYY-MM-DD`, bump the version, merge, tag `vx.y.z`.
   `.github/workflows/release.yml` checks, builds and publishes to npmjs.com via **Trusted Publishing** (OIDC, no stored
   token; provenance is automatic) after approval in the `npm` environment. Token publishing is disabled on npm.
-- Project repos pick it up via their weekly `gtm-upgrade` workflow (opens a PR) or `pnpm gtm upgrade`.
+- Project repos pick it up via their weekly `gtm-upgrade` workflow (opens a PR) or `npx gtm upgrade`.
 
 ## 4. Working in this repo
 

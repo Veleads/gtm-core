@@ -36,9 +36,9 @@ Read the operator manual agents follow in project repos: [kit/AGENTS.md](kit/AGE
 
 ```bash
 npx @veleads/gtm init acme --name "Acme Corp"
-cd gtm-project-acme && pnpm install
-pnpm gtm status
-pnpm gtm validate
+cd gtm-project-acme && npm install     # or pnpm / yarn: any package manager works
+npx gtm status
+npx gtm validate
 ```
 
 Push it to a **private** repo, open it in Claude Code or Codex, and start with stage `00-intake`.

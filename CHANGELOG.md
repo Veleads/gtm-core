@@ -10,6 +10,10 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
   `churned` → `closed`. `gtm migrate` (run by `gtm upgrade`) renames the files and keys in place,
   keeping comments; existing ICP/copy approvals stay valid. New repos are named `gtm-project-<slug>`.
 - **action** Approvals are recorded as name and role, e.g. `--by "Maria Chen (VP Marketing)"`.
+- **action** Project repos no longer require pnpm. New repos default to npm (no `packageManager` pin),
+  and every command is `npx gtm <command>`. CI and `gtm upgrade` use whichever package manager the
+  repo's committed lockfile belongs to (npm, pnpm or yarn). Existing repos: copy the CI workflows from
+  `.gtm/templates/repo/github/workflows/` after upgrading.
 
 ## [0.2.1] - 2026-10-24
 - **no action** The npm package now has a README (what it is, quick start, commands, guidance for

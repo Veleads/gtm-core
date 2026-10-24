@@ -28,10 +28,10 @@ Define who we target and why, in a form both humans (icp.md) and code (icp.yaml,
 6. Add `exclusions`: competitor domains, excluded industries/countries.
 7. Estimate expected TAM range per segment (rough, from intake or a quick count if a TAM command is
    available). This sets up the stage-2 sanity check.
-8. `pnpm gtm validate` must pass.
+8. `npx gtm validate` must pass.
 9. **HARD STOP.** Present to the human for sign-off: segments + filters, personas, exclusions,
    signals with weights, expected TAM range. Only after explicit approval from the named approver,
-   record it: `pnpm gtm approve icp --by "<Name (role)>" --notes "<what was approved>"`. Quote the
+   record it: `npx gtm approve icp --by "<Name (role)>" --notes "<what was approved>"`. Quote the
    approval in the run log and commit both together.
 
 ## Outputs
@@ -47,10 +47,10 @@ Define who we target and why, in a form both humans (icp.md) and code (icp.yaml,
 - [ ] Approval recorded with `gtm approve icp`, not by hand
 
 ## Gate
-**ICP sign-off (hard stop).** Recorded with `pnpm gtm approve icp`, which pins a hash of the
+**ICP sign-off (hard stop).** Recorded with `npx gtm approve icp`, which pins a hash of the
 approved content. Any later change to segments, personas, exclusions or other ICP content makes
-`pnpm gtm validate` fail until the ICP is re-presented and approved again (or the change is reverted).
+`npx gtm validate` fail until the ICP is re-presented and approved again (or the change is reverted).
 Comments and formatting do not count as changes.
 
 ## Next
-Create a campaign (`pnpm gtm new-campaign <slug>`) and go to `.gtm/skills/02-tam/SKILL.md`.
+Create a campaign (`npx gtm new-campaign <slug>`) and go to `.gtm/skills/02-tam/SKILL.md`.

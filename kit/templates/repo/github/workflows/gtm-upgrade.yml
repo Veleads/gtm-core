@@ -14,19 +14,25 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-      - run: pnpm install --frozen-lockfile
+      - name: Install
+        run: |
+          if [ -f pnpm-lock.yaml ]; then npx -y pnpm@10 install --frozen-lockfile
+          elif [ -f yarn.lock ]; then npx -y yarn@1 install --frozen-lockfile
+          elif [ -f package-lock.json ]; then npm ci
+          else npm install
+          fi
       - name: Upgrade core (sync + migrate + validate)
         id: upgrade
         run: |
           before=$(node -p "require('./package.json').devDependencies['@veleads/gtm']")
-          pnpm exec gtm upgrade 2>&1 | tee upgrade.log || true
+          npx gtm upgrade 2>&1 | tee "$RUNNER_TEMP/upgrade.log" || true
           after=$(node -p "require('./package.json').devDependencies['@veleads/gtm']")
           echo "before=$before" >> "$GITHUB_OUTPUT"
           echo "after=$after" >> "$GITHUB_OUTPUT"
+      # Commits every change the upgrade made (kit, AGENTS.md, lockfile, migrated and renamed files).
       - name: Open PR
         if: steps.upgrade.outputs.before != steps.upgrade.outputs.after
         uses: peter-evans/create-pull-request@v8
@@ -34,12 +40,4 @@ jobs:
           branch: upgrade/core-v${{ steps.upgrade.outputs.after }}
           title: "chore: core ${{ steps.upgrade.outputs.before }} → ${{ steps.upgrade.outputs.after }}"
           commit-message: "chore: core v${{ steps.upgrade.outputs.after }}"
-          body-path: upgrade.log
-          add-paths: |
-            package.json
-            pnpm-lock.yaml
-            AGENTS.md
-            .gtm/**
-            project.yaml
-            context/*.yaml
-            campaigns/*/config.yaml
+          body-path: ${{ runner.temp }}/upgrade.log

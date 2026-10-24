@@ -25,7 +25,7 @@ export function runStatus(root: string): boolean {
     const last = existsSync(runsDir) ? readdirSync(runsDir).filter((f) => f.endsWith(".md")).sort().at(-1) ?? "-" : "-";
     return [id, cfg.stage ?? "?", cfg.gates?.copy?.status ?? "?", cfg.gates?.launch?.status ?? "?", cfg.owner ?? "?", last];
   });
-  if (!rows.length) { console.log("no campaigns yet: pnpm gtm new-campaign <campaign-slug>"); return true; }
+  if (!rows.length) { console.log("no campaigns yet: npx gtm new-campaign <campaign-slug>"); return true; }
 
   const header = ["campaign", "stage", "copy gate", "launch gate", "owner", "latest run log"];
   const widths = header.map((h, i) => Math.max(h.length, ...rows.map((r) => String(r[i]).length)));

@@ -17,9 +17,9 @@ contacted ever reaches the sender.
 ## Steps
 1. Check suppression freshness: every list in `config.yaml` → `suppression.lists` must exist for
    this project and be ≤ 30 days old. If not, stop (AGENTS.md mandatory stop).
-2. Fetch signals if configured: `pnpm gtm job signals <campaign>`. Only signals listed in
+2. Fetch signals if configured: `npx gtm job signals <campaign>`. Only signals listed in
    `scoring.signals` count; events older than `freshness_days` are ignored by the job.
-3. Run `pnpm gtm job qualify <campaign>`. Scoring (done by code, not by you):
+3. Run `npx gtm job qualify <campaign>`. Scoring (done by code, not by you):
    `score = segment_match (if account matches a campaign segment) + persona_role[role] + Σ weight of fresh signals`.
    Tier: `score ≥ tiers.A` → A; `≥ tiers.B` → B; else C.
    Suppression: contact or domain in any configured list, or contacted for this project in the last

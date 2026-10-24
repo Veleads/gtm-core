@@ -36,8 +36,8 @@ function loadVersioned<S extends z.ZodType>(r: Report, file: string, kind: FileK
   try { raw = parse(readFileSync(file, "utf8")); } catch (e) { r.err(file, `invalid YAML: ${(e as Error).message}`); return null; }
   const expected = FILE_VERSIONS[kind];
   if (raw?.version !== expected) {
-    if (typeof raw?.version === "number" && raw.version < expected) r.err(file, `is version ${raw.version}, core v${GTM_VERSION} expects ${expected}: run \`pnpm gtm migrate\``);
-    else if (typeof raw?.version === "number") r.err(file, `is version ${raw.version}, newer than core v${GTM_VERSION} (${expected}): run \`pnpm gtm upgrade\``);
+    if (typeof raw?.version === "number" && raw.version < expected) r.err(file, `is version ${raw.version}, core v${GTM_VERSION} expects ${expected}: run \`npx gtm migrate\``);
+    else if (typeof raw?.version === "number") r.err(file, `is version ${raw.version}, newer than core v${GTM_VERSION} (${expected}): run \`npx gtm upgrade\``);
     else r.err(file, `missing "version: ${expected}"`);
     return null;
   }
@@ -55,8 +55,8 @@ function checkCoreSync(r: Report, root: string) {
   if (!/^\d+\.\d+\.\d+/.test(pinned)) r.err(join(root, "package.json"), `${PACKAGE_NAME} must be pinned exactly (got "${pinned}")`);
   const versionFile = join(root, ".gtm", "VERSION");
   const synced = existsSync(versionFile) ? readFileSync(versionFile, "utf8").trim() : null;
-  if (synced !== GTM_VERSION) r.err(versionFile, `is ${synced ?? "missing"}, installed core is ${GTM_VERSION}: run \`pnpm gtm sync\``);
-  if (!existsSync(join(root, "AGENTS.md"))) r.err(join(root, "AGENTS.md"), "missing: run `pnpm gtm sync`");
+  if (synced !== GTM_VERSION) r.err(versionFile, `is ${synced ?? "missing"}, installed core is ${GTM_VERSION}: run \`npx gtm sync\``);
+  if (!existsSync(join(root, "AGENTS.md"))) r.err(join(root, "AGENTS.md"), "missing: run `npx gtm sync`");
 }
 
 /** Data rule: no lead data in git. Blocks data files, flags real-looking email addresses. */
@@ -123,7 +123,7 @@ function validateCampaign(r: Report, root: string, projectId: string, campaign: 
     }
     const copyFile = join(dir, "copy.md");
     const copyApproved = existsSync(copyFile)
-      ? checkPinnedApproval(r, copyFile, cfg.gates.copy, copyContentHash(readFileSync(copyFile, "utf8")), "copy", `pnpm gtm approve copy ${campaign}`)
+      ? checkPinnedApproval(r, copyFile, cfg.gates.copy, copyContentHash(readFileSync(copyFile, "utf8")), "copy", `npx gtm approve copy ${campaign}`)
       : false;
     if (stageIndex(cfg.stage) > stageIndex("copy") && !copyApproved) {
       r.err(cfgFile, `stage is "${cfg.stage}" but gates.copy is not approved, or copy.md changed since approval`);
@@ -170,7 +170,7 @@ export function runValidate(root: string, onlyCampaign?: string): boolean {
   if (meta && icp && icp.project_id !== projectId) r.err(icpFile, `project_id "${icp.project_id}" does not match project.yaml "${projectId}"`);
   if (meta && signals && signals.project_id !== projectId) r.err(sigFile, `project_id "${signals.project_id}" does not match project.yaml "${projectId}"`);
   const icpApproved = icp
-    ? checkPinnedApproval(r, icpFile, icp.approval, icpContentHash(parse(readFileSync(icpFile, "utf8"))), "ICP", "pnpm gtm approve icp")
+    ? checkPinnedApproval(r, icpFile, icp.approval, icpContentHash(parse(readFileSync(icpFile, "utf8"))), "ICP", "npx gtm approve icp")
     : false;
 
   checkNoLeadData(r, root);

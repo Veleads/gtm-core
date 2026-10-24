@@ -8,15 +8,28 @@ import { PACKAGE_NAME } from "../paths.ts";
 import { campaignStages } from "./status.ts";
 import { pinnedVersion } from "./validate.ts";
 
-/**
- * Runs pnpm: from PATH if available, else the exact version pinned in the project's
- * package.json "packageManager" via npx. (npm_execpath is unreliable: under npx it points to npm.)
- */
-function pm(root: string, args: string[]): number {
-  const onPath = spawnSync("pnpm", ["--version"], { stdio: "ignore" }).status === 0;
-  const pinned = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).packageManager ?? "pnpm@10";
-  const [cmd, pre] = onPath ? ["pnpm", []] : ["npx", ["-y", pinned]];
-  return spawnSync(cmd, [...pre, ...args], { cwd: root, stdio: "inherit" }).status ?? 1;
+type PackageManager = "npm" | "pnpm" | "yarn";
+
+/** The project's package manager, from its committed lockfile (npm when there is none). */
+export function detectPackageManager(root: string): PackageManager {
+  if (existsSync(join(root, "pnpm-lock.yaml"))) return "pnpm";
+  if (existsSync(join(root, "yarn.lock"))) return "yarn";
+  return "npm";
+}
+
+/** Installs an exact version of the core with the project's own package manager. */
+function installExact(root: string, pm: PackageManager, spec: string): number {
+  const onPath = (bin: string) => spawnSync(bin, ["--version"], { stdio: "ignore" }).status === 0;
+  const [cmd, args] =
+    pm === "npm" ? ["npm", ["install", "--save-dev", "--save-exact", spec]]
+    : pm === "pnpm" ? (onPath("pnpm") ? ["pnpm", ["add", "-D", "--save-exact", spec]] : ["npx", ["-y", "pnpm@10", "add", "-D", "--save-exact", spec]])
+    : onPath("yarn") ? ["yarn", ["add", "-D", "--exact", spec]] : ["npx", ["-y", "yarn@1", "add", "-D", "--exact", spec]];
+  return spawnSync(cmd as string, args as string[], { cwd: root, stdio: "inherit" }).status ?? 1;
+}
+
+/** Runs the freshly installed CLI (node_modules/.bin), whichever package manager installed it. */
+function gtm(root: string, args: string[]): number {
+  return spawnSync("npx", ["gtm", ...args], { cwd: root, stdio: "inherit" }).status ?? 1;
 }
 
 const FROZEN_STAGES = ["qa", "launch"];
@@ -38,12 +51,13 @@ export function runUpgrade(root: string, opts: { version?: string; force?: boole
   }
 
   const target = opts.version ?? "latest";
-  console.log(`Upgrading ${PACKAGE_NAME} ${before} → ${target}`);
-  if (pm(root, ["add", "-D", "--save-exact", `${PACKAGE_NAME}@${target}`]) !== 0) return false;
-  // The steps below must run with the NEW version's binary, hence `exec` rather than in-process calls.
-  if (pm(root, ["exec", "gtm", "sync"]) !== 0) return false;
-  if (pm(root, ["exec", "gtm", "migrate"]) !== 0) return false;
-  const valid = pm(root, ["exec", "gtm", "validate"]) === 0;
+  const pm = detectPackageManager(root);
+  console.log(`Upgrading ${PACKAGE_NAME} ${before} → ${target} (with ${pm})`);
+  if (installExact(root, pm, `${PACKAGE_NAME}@${target}`) !== 0) return false;
+  // The steps below must run with the NEW version's binary, hence a new process rather than in-process calls.
+  if (gtm(root, ["sync"]) !== 0) return false;
+  if (gtm(root, ["migrate"]) !== 0) return false;
+  const valid = gtm(root, ["validate"]) === 0;
 
   const after = pinnedVersion(root) ?? target;
   const changelog = join(root, "node_modules", ...PACKAGE_NAME.split("/"), "CHANGELOG.md");

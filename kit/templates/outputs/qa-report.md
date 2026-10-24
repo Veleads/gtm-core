@@ -3,7 +3,7 @@
 > Stage 6 output, saved as campaigns/<campaign>/qa.md. Every box must be checked or explained.
 
 ## 1. Data
-- [ ] `pnpm gtm validate <campaign>` passes
+- [ ] `npx gtm validate <campaign>` passes
 - [ ] Lead export validated against schemas `Lead`: <n> valid / <n> rejected (reasons)
 - [ ] Only send_tiers present; tier counts: A <n> · B <n>
 - [ ] Suppression re-checked within 24h of launch: <n> removed

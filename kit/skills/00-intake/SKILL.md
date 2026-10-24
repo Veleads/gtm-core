@@ -24,7 +24,7 @@ Collect everything later stages need, once, in files, so no one has to re-ask th
    job (`suppression:import`, see AGENTS.md section 7).
 6. Write a first draft of `voice.md` and `proof.md` from what the stakeholders gave you (proof items
    default to "approved for outbound: no" until the approver confirms).
-7. Run `pnpm gtm validate`. Template TODOs in icp/signals yaml are expected at this point.
+7. Run `npx gtm validate`. Template TODOs in icp/signals yaml are expected at this point.
 
 ## Outputs
 - `project.yaml`, `context/intake.md` complete; draft `voice.md`, `proof.md`.

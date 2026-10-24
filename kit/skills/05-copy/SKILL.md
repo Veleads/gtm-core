@@ -29,7 +29,7 @@ the approver signed off.
    lead (fictional name and company) for the human.
 6. **HARD STOP.** Present all variants for sign-off. Edits requested → change, re-present,
    still pending. Only after explicit approval from the named approver, record it:
-   `pnpm gtm approve copy <campaign> --by "<Name (role)>" --notes "<what was approved>"`. Quote the
+   `npx gtm approve copy <campaign> --by "<Name (role)>" --notes "<what was approved>"`. Quote the
    approval in the run log and commit `copy.md`, `config.yaml` and the run log together.
 
 ## Outputs
@@ -45,8 +45,8 @@ the approver signed off.
 - [ ] Plain-text friendly; at most one link, none in step 1 preferred
 
 ## Gate
-**Copy sign-off (hard stop).** Recorded with `pnpm gtm approve copy <campaign>`, which pins a
-hash of `copy.md`. Any later change to the copy makes `pnpm gtm validate` fail and blocks the campaign
+**Copy sign-off (hard stop).** Recorded with `npx gtm approve copy <campaign>`, which pins a
+hash of `copy.md`. Any later change to the copy makes `npx gtm validate` fail and blocks the campaign
 past `copy` until it is re-approved (or the change is reverted). Note lines starting with `>` (status,
 available variables) and whitespace-only changes do not count.
 

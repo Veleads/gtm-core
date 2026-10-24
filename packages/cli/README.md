@@ -9,14 +9,14 @@ Source: [Veleads/gtm-core](https://github.com/Veleads/gtm-core) · MIT
 
 ## Quick start
 
-Requires Node.js 22+ and pnpm (`corepack enable`, or use `npx pnpm@10`).
+Requires Node.js 22+. npm is enough; pnpm or yarn work too (the repo follows whichever lockfile you commit).
 
 ```bash
 npx @veleads/gtm init acme --name "Acme Corp"
 cd gtm-project-acme
-pnpm install
-pnpm gtm status
-pnpm gtm validate
+npm install
+npx gtm status
+npx gtm validate
 ```
 
 Push the new folder to a **private** repository, then open it in your coding agent. The generated
@@ -38,7 +38,7 @@ editing either afterwards makes `gtm validate` fail until it's re-approved.
 
 ## Commands
 
-Run inside a project repo as `pnpm gtm <command>`. `gtm <command> --help` shows usage, **what the
+Run inside a project repo as `npx gtm <command>` (whichever package manager installed it). `gtm <command> --help` shows usage, **what the
 command writes**, and examples, without running it.
 
 | Command | What it does | Writes |
@@ -68,5 +68,5 @@ Exit codes: `0` success, `1` failure or validation errors.
 ## Upgrades
 
 Project repos pin an exact version. New releases arrive as a pull request from the repo's weekly
-`gtm-upgrade` workflow, or via `pnpm gtm upgrade`. Breaking YAML changes ship with automatic
+`gtm-upgrade` workflow, or via `npx gtm upgrade`. Breaking YAML changes ship with automatic
 migrations; see [CHANGELOG.md](https://github.com/Veleads/gtm-core/blob/main/CHANGELOG.md).

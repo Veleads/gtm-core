@@ -6,10 +6,10 @@ Private project repo. Runs the standard gtm-brain process from the public core p
 
 ## Setup
 ```bash
-pnpm install
+npm install          # or: pnpm install / yarn install
 cp .env.example .env
-pnpm gtm status
-pnpm gtm validate
+npx gtm status
+npx gtm validate
 ```
 
 ## What lives where
@@ -21,4 +21,4 @@ pnpm gtm validate
 
 ## Core upgrades
 A weekly workflow opens a PR when a new core is released (`.github/workflows/gtm-upgrade.yml`).
-Manually: `pnpm gtm upgrade` (refuses while a campaign is between QA and launch).
+Manually: `npx gtm upgrade` (refuses while a campaign is between QA and launch).

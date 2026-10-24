@@ -2,7 +2,6 @@
   "name": "gtm-project-__PROJECT_ID__",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.34.7",
   "scripts": {
     "gtm": "gtm",
     "check": "gtm sync --check && gtm validate"

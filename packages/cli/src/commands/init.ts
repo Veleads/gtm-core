@@ -31,7 +31,7 @@ export function runInit(slug: string | undefined, opts: { name?: string; dir?: s
 Next:
   1. Create a PRIVATE GitHub repo for it (e.g. <your-org>/gtm-project-${slug}) and push this folder.
      Project repos hold project context: never make them public.
-  2. pnpm install && pnpm gtm validate     (TODO warnings remain until intake is done)
+  2. npm install && npx gtm validate     (or pnpm/yarn; TODO warnings remain until intake is done)
   3. Open the repo in Claude Code or Codex and start with stage 00-intake.`);
   return true;
 }

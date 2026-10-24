@@ -12,7 +12,7 @@ Know what is working by segment × variant, protect deliverability, and feed lea
 - `config.yaml` → `sending.sender_campaign_ref`; `brief.md` success metrics
 
 ## Steps
-1. `pnpm gtm job results <campaign>`: pulls events since the last pull into `outreach_events`,
+1. `npx gtm job results <campaign>`: pulls events since the last pull into `outreach_events`,
    updates lead statuses, adds bounces/unsubscribes to suppression, prints aggregates by
    segment × variant × step.
 2. Health check first: bounce rate > 3% or any spam complaints → mandatory stop; recommend pausing
@@ -39,4 +39,4 @@ None (recurring). The campaign ends when the brief's timeframe ends or the human
 final report and set `project.yaml` status if the engagement ends.
 
 ## Next
-Next campaign: `pnpm gtm new-campaign <slug>` → routing table.
+Next campaign: `npx gtm new-campaign <slug>` → routing table.

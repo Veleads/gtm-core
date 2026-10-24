@@ -48,7 +48,7 @@ export function runSync(root: string, opts: { check?: boolean } = {}): boolean {
   if (opts.check) {
     const diffs = checkSync(root);
     if (diffs.length === 0) { console.log(`in sync with ${PACKAGE_NAME} v${GTM_VERSION}`); return true; }
-    console.log(`out of sync with ${PACKAGE_NAME} v${GTM_VERSION} (run \`pnpm gtm sync\`; never edit .gtm/ or AGENTS.md by hand):`);
+    console.log(`out of sync with ${PACKAGE_NAME} v${GTM_VERSION} (run \`npx gtm sync\`; never edit .gtm/ or AGENTS.md by hand):`);
     for (const d of diffs) console.log(`  ${d}`);
     return false;
   }
