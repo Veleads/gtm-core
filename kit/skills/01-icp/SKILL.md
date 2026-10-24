@@ -14,7 +14,8 @@ Define who we target and why, in a form both humans (icp.md) and code (icp.yaml,
 - Schemas: `.gtm/schemas/icp.schema.json`, `.gtm/schemas/signals.schema.json`
 
 ## Steps
-1. From the best-customer list, find what the winners share: industry, size band, region, tech,
+1. Start from `context/research.md` (public customers, competitors, triggers) and the confirmed
+   intake. From the best-customer list, find what the winners share: industry, size band, region, tech,
    business model. Write evidence, not guesses (e.g. "7 of 10 best customers use Sage 200").
 2. Define 1–3 **segments**. Each segment must be expressible as filters in `icp.yaml`
    (`industries`, `employee_count`, `hq_countries`, `technologies_any/none`, `keywords_any/none`).
@@ -29,10 +30,16 @@ Define who we target and why, in a form both humans (icp.md) and code (icp.yaml,
 7. Estimate expected TAM range per segment (rough, from intake or a quick count if a TAM command is
    available). This sets up the stage-2 sanity check.
 8. `npx gtm validate` must pass.
-9. **HARD STOP.** Present to the human for sign-off: segments + filters, personas, exclusions,
-   signals with weights, expected TAM range. Only after explicit approval from the named approver,
-   record it: `npx gtm approve icp --by "<Name (role)>" --notes "<what was approved>"`. Quote the
-   approval in the run log and commit both together.
+9. **HARD STOP.** Present for sign-off: segments + filters, personas, exclusions, signals with
+   weights, expected TAM range. Record the approval:
+   - **GitHub approver** (`owners.approver` is `@handle`): commit the files on a branch, open a PR
+     (`gh pr create`), run `npx gtm track gate-open icp --pr <number>` and **stop**. After the
+     approver approves the PR on GitHub, run `npx gtm approve icp --pr <number>` (it verifies
+     the review on GitHub), commit the recorded approval and push it to the same PR branch, merge
+     once CI passes, then `npx gtm track gate-done icp`.
+   - **Named approver** (not on GitHub): present in the session; only after their explicit approval,
+     `npx gtm approve icp --by "<Name (role)>" --notes "<what was approved>"`.
+   Either way, quote the approval in the run log.
 
 ## Outputs
 `context/icp.md`, `icp.yaml`, `signals.yaml`, `personas.md`, `offer.md`, `proof.md`, `voice.md`.

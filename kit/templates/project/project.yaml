@@ -4,9 +4,13 @@ project_id: __PROJECT_ID__
 name: __PROJECT_NAME__
 status: onboarding
 started_at: __TODAY__
+# Owners: use GitHub handles (@username). An approver handle makes ICP/copy sign-off a PR review that
+# GitHub enforces (CODEOWNERS). Use a plain name only for an approver who isn't on GitHub.
 owners:
-  gtm_engineer: TODO
-  sdrs: []
-  approver: TODO # person who signs off ICP and copy for this project
-regions: [TODO]
+  gtm_engineer: TODO # e.g. "@abdullah": runs the agent and jobs
+  sdrs: [] # e.g. ["@sara"]: handle replies and meetings
+  approver: TODO # e.g. "@maria": signs off ICP and copy
+regions: [TODO] # where prospects are, e.g. [UK, US]
 features: {} # opt-in core features (see .gtm/ CHANGELOG / FEATURES)
+tracker:
+  kind: github # mirror stages and gates as GitHub issues (`npx gtm track`); "none" to switch off

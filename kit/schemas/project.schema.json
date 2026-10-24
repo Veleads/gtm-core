@@ -33,19 +33,21 @@
       "properties": {
         "gtm_engineer": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "GitHub handle (@user) or name"
         },
         "sdrs": {
           "type": "array",
           "items": {
             "type": "string",
             "minLength": 1
-          }
+          },
+          "description": "GitHub handles (@user) or names"
         },
         "approver": {
           "type": "string",
           "minLength": 1,
-          "description": "Person who signs off ICP and copy for this project"
+          "description": "Signs off ICP and copy. A GitHub handle (@user) makes approvals PR reviews enforced by GitHub; a name records them by name"
         }
       },
       "required": [
@@ -73,6 +75,25 @@
       "additionalProperties": {
         "type": "boolean"
       }
+    },
+    "tracker": {
+      "default": {
+        "kind": "none"
+      },
+      "description": "Where `gtm track` mirrors stages and gates. Git files stay the source of truth",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "github",
+            "none"
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ]
     }
   },
   "required": [

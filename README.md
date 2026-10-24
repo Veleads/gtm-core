@@ -29,7 +29,9 @@ gtm-core (this repo, public) ──release──► @veleads/gtm on npm
                          AGENTS.md (generated) · PROJECT.md · project.yaml · context/ · campaigns/
 ```
 
-The 9 stages: intake → ICP (gate) → TAM → enrich → qualify → copy (gate) → QA → launch (gate) → results.
+The 9 stages: intake (research first) → ICP (gate) → TAM → enrich → qualify → copy (gate) → QA →
+launch (gate) → results. With GitHub handles as owners, ICP and copy sign-off are PR reviews enforced
+by GitHub, and `gtm track` mirrors every campaign and gate as an issue.
 Read the operator manual agents follow in project repos: [kit/AGENTS.md](kit/AGENTS.md).
 
 ## Start a project repo

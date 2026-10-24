@@ -48,8 +48,10 @@ command writes**, and examples, without running it.
 | `new-campaign <slug>` | scaffold `campaigns/<slug>/` | that folder |
 | `validate [campaign]` | schemas, gates, cross-references, no lead data, core sync | nothing |
 | `status` | campaigns, stages, gates | nothing |
-| `approve icp --by "<name>"` | record ICP sign-off, pin its hash | `context/icp.yaml` |
-| `approve copy <campaign> --by "<name>"` | record copy sign-off, pin its hash | campaign `config.yaml` |
+| `approve icp --pr <n>` / `--by "<name>"` | record ICP sign-off (GitHub PR review, or by name), pin its hash | `context/icp.yaml` |
+| `approve copy <campaign> --pr <n>` / `--by "<name>"` | record copy sign-off the same way | campaign `config.yaml` |
+| `track stage\|gate-open\|gate-done …` | mirror stages and gates as GitHub issues (or `none`) | tracker only |
+| `github setup [--apply]` | labels + approval ruleset on the repo | GitHub settings |
 | `sync [--check]` | copy the core kit into `.gtm/` + `AGENTS.md` | `.gtm/`, `AGENTS.md` (nothing with `--check`) |
 | `migrate [--dry-run]` | move YAML files to the current schema versions | YAML files |
 | `upgrade [version]` | install a newer core, sync, migrate, validate, show changelog | deps, `.gtm/`, YAML |
@@ -57,9 +59,18 @@ command writes**, and examples, without running it.
 
 Exit codes: `0` success, `1` failure or validation errors.
 
+## GitHub mode
+
+Set `project.yaml` owners to GitHub handles (`approver: "@maria"`). ICP and copy sign-off then **is**
+the approver's PR review: `gtm sync` makes them the CODEOWNER of those files, `gtm approve … --pr <n>`
+verifies the review on GitHub, and CI (`gtm validate --verify-github`) re-checks it against the exact
+reviewed content. Stages and gates are mirrored as issues with `gtm track`. Approvers who aren't on
+GitHub (or solo projects) use a plain name and `--by`. Details: `.gtm/guides/github.md`.
+
 ## For coding agents
 
 - Inside a project repo, **read `AGENTS.md` first** and follow it; then `PROJECT.md`.
+- Intake starts with the `research` skill: research the business before asking anyone anything.
 - Read-only commands are always safe: `validate`, `status`, `sync --check`, `migrate --dry-run`,
   and any `--help`.
 - Never edit `AGENTS.md` or `.gtm/`. Never run `gtm approve` unless a named human explicitly approved

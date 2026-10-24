@@ -1,6 +1,8 @@
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { runApprove } from "./commands/approve.ts";
+import { runGithub } from "./commands/github.ts";
+import { runTrack } from "./commands/track.ts";
 import { runInit } from "./commands/init.ts";
 import { runJob } from "./commands/job.ts";
 import { runMigrate } from "./commands/migrate.ts";
@@ -20,6 +22,9 @@ const { values, positionals } = parseArgs({
     name: { type: "string" },
     dir: { type: "string" },
     slug: { type: "string" },
+    pr: { type: "string" },
+    apply: { type: "boolean" },
+    "verify-github": { type: "boolean" },
     by: { type: "string" },
     notes: { type: "string" },
     date: { type: "string" },
@@ -43,16 +48,18 @@ function help(name: string | undefined): boolean {
   return true;
 }
 
-function run(): boolean {
+async function run(): Promise<boolean> {
   if (values.version) { console.log(GTM_VERSION); return true; }
   // `gtm <command> --help` and `gtm help <command>` print help and never run the command.
   if (values.help) return help(command === "help" ? args[0] : command);
   switch (command) {
     case "init": return runInit(args[0], { name: values.name, dir: values.dir, slug: values.slug, cwd });
     case "new-campaign": return runNewCampaign(root, args[0]);
-    case "validate": return runValidate(root, args[0]);
+    case "validate": return runValidate(root, args[0], { verifyGithub: values["verify-github"] });
     case "status": return runStatus(root);
-    case "approve": return runApprove(root, args, { by: values.by, notes: values.notes, date: values.date });
+    case "approve": return runApprove(root, args, { by: values.by, notes: values.notes, date: values.date, pr: values.pr });
+    case "track": return runTrack(root, args, { pr: values.pr });
+    case "github": return runGithub(root, args, { apply: values.apply });
     case "sync": return runSync(root, { check: values.check });
     case "migrate": return runMigrate(root, { dryRun: values["dry-run"] });
     case "upgrade": return runUpgrade(root, { version: args[0], force: values.force });
@@ -63,4 +70,4 @@ function run(): boolean {
   }
 }
 
-process.exit(run() ? 0 : 1);
+process.exit((await run()) ? 0 : 1);

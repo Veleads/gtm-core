@@ -4,6 +4,19 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+- **action** Research-first intake: new `research` skill writes `context/research.md` (sourced facts,
+  public customers as suppression candidates, competitors as exclusion candidates, triggers) before any
+  questions; `00-intake` drafts intake from it and asks only what research can't answer, with an
+  example per question. `validate` warns while `context/research.md` is missing.
+- **action** GitHub-enforced approvals: when `owners.approver` is an `@handle`, ICP and copy sign-off is
+  the approver's APPROVED review on a PR. `gtm approve icp|copy … --pr <n>` verifies it on GitHub and
+  records `approved_via`; `gtm validate` requires it, and `--verify-github` (in the CI template)
+  re-checks the review and that the reviewed commit matches the pinned hash. `gtm sync` maintains a
+  CODEOWNERS block for the approver. Named approvers keep `--by`. Existing repos: copy
+  `.gtm/templates/repo/github/workflows/gtm.yml` to enable verification in CI.
+- **opt-in** `gtm track` mirrors stages and gates into a tracker (`project.yaml` → `tracker.kind`:
+  `github` issues, or `none`, the default for existing repos). New `gtm github setup [--apply]` creates
+  labels and the approval ruleset. Guide: `.gtm/guides/github.md` (incl. an org-wide board).
 
 ## [0.4.0] - 2026-10-24
 - **no action** `gtm init . --name "<Name>"` sets up the current folder instead of creating a

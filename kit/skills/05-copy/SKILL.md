@@ -28,9 +28,15 @@ the approver signed off.
 5. Self-review against the checklist below, then render each step once with a fictional example
    lead (fictional name and company) for the human.
 6. **HARD STOP.** Present all variants for sign-off. Edits requested → change, re-present,
-   still pending. Only after explicit approval from the named approver, record it:
-   `npx gtm approve copy <campaign> --by "<Name (role)>" --notes "<what was approved>"`. Quote the
-   approval in the run log and commit `copy.md`, `config.yaml` and the run log together.
+   still pending. Record the approval:
+   - **GitHub approver** (`owners.approver` is `@handle`): commit the files on a branch, open a PR
+     (`gh pr create`), run `npx gtm track gate-open copy <campaign> --pr <number>` and **stop**. After the
+     approver approves the PR on GitHub, run `npx gtm approve copy <campaign> --pr <number>` (it verifies
+     the review on GitHub), commit the recorded approval and push it to the same PR branch, merge
+     once CI passes, then `npx gtm track gate-done copy <campaign>`.
+   - **Named approver** (not on GitHub): present in the session; only after their explicit approval,
+     `npx gtm approve copy <campaign> --by "<Name (role)>" --notes "<what was approved>"`.
+   Either way, quote the approval in the run log.
 
 ## Outputs
 `copy.md` (status line at top reflects the gate). Run log.
