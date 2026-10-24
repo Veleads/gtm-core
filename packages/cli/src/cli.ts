@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { runApprove } from "./commands/approve.ts";
+import { runIcp } from "./commands/icp.ts";
 import { runGithub } from "./commands/github.ts";
 import { runTrack } from "./commands/track.ts";
 import { runInit } from "./commands/init.ts";
@@ -57,6 +58,7 @@ async function run(): Promise<boolean> {
     case "new-campaign": return runNewCampaign(root, args[0]);
     case "validate": return runValidate(root, args[0], { verifyGithub: values["verify-github"] });
     case "status": return runStatus(root);
+    case "icp": return runIcp(root);
     case "approve": return runApprove(root, args, { by: values.by, notes: values.notes, date: values.date, pr: values.pr });
     case "track": return runTrack(root, args, { pr: values.pr });
     case "github": return runGithub(root, args, { apply: values.apply });

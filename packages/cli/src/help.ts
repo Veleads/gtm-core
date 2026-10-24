@@ -54,6 +54,17 @@ export const COMMANDS: Record<string, CommandHelp> = {
     writes: "Nothing (read-only).",
     examples: ["npx gtm status"],
   },
+  icp: {
+    usage: "gtm icp",
+    summary: "show the ICP as jobs see it (core + segment overrides)",
+    details: [
+      "Prints the core profile, then every segment's FINAL filters (core with the segment's fields",
+      "replacing the same core fields), which fields the segment overrides, its personas, and the",
+      "shared exclusions. Use it to review an ICP before sign-off and to check what `gtm job tam` searches.",
+    ],
+    writes: "Nothing (read-only).",
+    examples: ["npx gtm icp"],
+  },
   approve: {
     usage: 'gtm approve icp --pr <number> [--notes ".."]\ngtm approve copy <campaign> --pr <number> [--notes ".."]\ngtm approve icp --by "<Name (role)>" [--notes ".."] [--date YYYY-MM-DD]\ngtm approve copy <campaign> --by "<Name (role)>" [..]',
     summary: "record a sign-off and pin a hash of the approved content",

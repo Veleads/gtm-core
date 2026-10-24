@@ -4,6 +4,16 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+- **no action** Layered ICP: `context/icp.yaml` can have an optional `core.firmographics` that every
+  segment shares; segments then hold only what differs, and a segment field **replaces** the same core
+  field (lists are not combined). Segments may restrict `personas`. Existing ICPs are unchanged and
+  stay valid. A segment that resolves to no filters at all is rejected.
+- **no action** `gtm icp` shows the ICP as jobs see it: core, each segment's final filters (marking
+  which fields the segment sets), personas and exclusions. `gtm job tam` uses the resolved filters.
+- **no action** `01-icp` skill and `icp.md` / `icp.yaml` templates rewritten around the five layers
+  (core, segments, personas, signals, exclusions) with a hypothesis, evidence and success criteria per
+  segment; `research` now outputs core and segment candidates. AGENTS.md states the assumption: from
+  stage 2 on the ICP is approved (stage 1 ends with a decision, revising later is normal).
 - **opt-in** `gtm job tam <campaign>` is available: builds the TAM through the workers (Hatchet) into
   Postgres and prints the funnel (TAM → reachable → active), cost, run_id and a run-log row. Needs an
   approved ICP and `config.yaml` → `tam: { source, max_accounts_per_segment }`; `mock-accounts`

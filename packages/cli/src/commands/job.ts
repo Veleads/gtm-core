@@ -7,7 +7,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse } from "yaml";
 import { loadStackEnv, STACK_ENV_FILE } from "@gtm/core";
-import { CampaignConfig, IcpFile, JOB_NAMES, ProjectFile, Stage, TamJobInput, TamJobResult } from "@gtm/schemas";
+import { CampaignConfig, IcpFile, JOB_NAMES, ProjectFile, Stage, TamJobInput, TamJobResult, resolveIcp } from "@gtm/schemas";
 import { GTM_VERSION } from "../paths.ts";
 import { runValidate } from "./validate.ts";
 
@@ -29,7 +29,10 @@ export function buildTamInput(root: string, campaign: string): TamJobInput | str
   if (icp.approval.status !== "approved") return "TAM needs an approved ICP (hard stop, AGENTS.md section 4). Get ICP sign-off first.";
   if (Stage.options.indexOf(cfg.stage) < Stage.options.indexOf("tam")) return `campaign stage is "${cfg.stage}": move it to "tam" first.`;
   if (!cfg.tam) return 'config.yaml has no `tam:` section. Add `tam: { source: mock-accounts }` for a local proof, or a real account source.';
-  const segments = icp.segments.filter((s) => cfg.segments.includes(s.id));
+  // Resolved filters (core + segment overrides): what the account source must search for.
+  const segments = resolveIcp(icp).segments
+    .filter((s) => cfg.segments.includes(s.id))
+    .map(({ id, description, firmographics }) => ({ id, description, firmographics }));
 
   return TamJobInput.parse({
     ctx: {

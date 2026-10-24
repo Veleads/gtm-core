@@ -64,6 +64,87 @@
         "approved_at"
       ]
     },
+    "core": {
+      "description": "Profile every segment shares. Segments only add or replace what differs",
+      "type": "object",
+      "properties": {
+        "firmographics": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "industries": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "employee_count": {
+              "type": "object",
+              "properties": {
+                "min": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "max": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              }
+            },
+            "revenue_usd": {
+              "type": "object",
+              "properties": {
+                "min": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "max": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              }
+            },
+            "hq_countries": {
+              "description": "ISO 3166-1 alpha-2",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 2
+              }
+            },
+            "technologies_any": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "technologies_none": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "keywords_any": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "keywords_none": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
     "segments": {
       "minItems": 1,
       "type": "array",
@@ -79,10 +160,10 @@
             "minLength": 1
           },
           "firmographics": {
+            "default": {},
             "type": "object",
             "properties": {
               "industries": {
-                "default": [],
                 "type": "array",
                 "items": {
                   "type": "string"
@@ -119,7 +200,6 @@
                 }
               },
               "hq_countries": {
-                "default": [],
                 "description": "ISO 3166-1 alpha-2",
                 "type": "array",
                 "items": {
@@ -129,40 +209,44 @@
                 }
               },
               "technologies_any": {
-                "default": [],
                 "type": "array",
                 "items": {
                   "type": "string"
                 }
               },
               "technologies_none": {
-                "default": [],
                 "type": "array",
                 "items": {
                   "type": "string"
                 }
               },
               "keywords_any": {
-                "default": [],
                 "type": "array",
                 "items": {
                   "type": "string"
                 }
               },
               "keywords_none": {
-                "default": [],
                 "type": "array",
                 "items": {
                   "type": "string"
                 }
               }
             }
+          },
+          "personas": {
+            "description": "Restrict to these persona ids; default: all personas",
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]*$"
+            }
           }
         },
         "required": [
           "id",
-          "description",
-          "firmographics"
+          "description"
         ]
       }
     },

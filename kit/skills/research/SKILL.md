@@ -30,8 +30,13 @@ so nothing invented reaches the ICP or the copy.
    blog/news. Capture: what they sell (one sentence), who it is for, pricing model and visible price
    points, proof points with numbers, positioning words they repeat.
 2. **Public customers:** logos and case studies on their site, plus credible mentions (press,
-   reviews). For each: company name, domain, industry/size if visible, source. These seed the ICP
-   (what do the best customers share?) and are **suppression candidates** (don't cold-email customers).
+   reviews). For each: company name, domain, industry/size/region/tech if visible, source. These are
+   **suppression candidates** (don't cold-email customers) and the main input for the ICP layers:
+   - **Core candidates:** traits most customers share (industry family, size band, required tech,
+     business model). Say how many share it ("7 of 10 use Bullhorn").
+   - **Segment candidates:** clusters that differ in a filter *and* in treatment (region/language,
+     sub-industry, size band, buyer). For each: the cluster, its members, and why it might need a
+     different angle.
 3. **Competitors (3–5):** from "alternatives to <business>" searches, review-site categories and
    comparison pages. For each: domain, one-line positioning, pricing if public, how the business
    differs. These are **exclusion candidates** for `icp.yaml`.
@@ -42,8 +47,9 @@ so nothing invented reaches the ICP or the copy.
    and the open questions only they can answer.
 
 ## Outputs
-`context/research.md`: sourced facts, customers (suppression candidates), competitors (exclusion
-candidates), triggers (signal candidates), open questions. Candidates are suggestions until a
+`context/research.md`: sourced facts, customers (suppression candidates), **core candidates** and
+**segment candidates** for the ICP, competitors (exclusion candidates), triggers (signal candidates),
+open questions. Candidates are suggestions until a
 stakeholder confirms them in intake or ICP.
 
 ## Checklist
