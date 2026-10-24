@@ -6,7 +6,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse } from "yaml";
-import { loadStackEnv, STACK_ENV_FILE } from "@gtm/core";
+import { loadStackEnv, projectStackEnvFile } from "@gtm/core";
 import { CampaignConfig, IcpFile, JOB_NAMES, ProjectFile, Stage, TamJobInput, TamJobResult, resolveIcp } from "@gtm/schemas";
 import { GTM_VERSION } from "../paths.ts";
 import { runValidate } from "./validate.ts";
@@ -81,9 +81,11 @@ export async function runJob(root: string, args: string[]): Promise<boolean> {
   try { input = buildTamInput(root, campaign); } catch (e) { console.error((e as Error).message); return false; }
   if (typeof input === "string") { console.error(input); return false; }
 
+  // This project's stack (`gtm stack up`) first; the gtm-core development stack (`pnpm stack:up`) as fallback.
+  loadStackEnv(projectStackEnvFile(input.ctx.project_id));
   loadStackEnv();
   if (!process.env.HATCHET_CLIENT_TOKEN) {
-    console.error(`No Hatchet connection. Local: run \`pnpm stack:up\` and \`pnpm worker\` in gtm-core (writes ${STACK_ENV_FILE}). Deployed: set HATCHET_CLIENT_TOKEN.`);
+    console.error(`No Hatchet connection. Run \`npx gtm stack up\` in this project repo (writes ${projectStackEnvFile(input.ctx.project_id)}). Deployed: set HATCHET_CLIENT_TOKEN.`);
     return false;
   }
   // Loaded lazily: only `gtm job` needs the Hatchet SDK.
@@ -92,7 +94,7 @@ export async function runJob(root: string, args: string[]): Promise<boolean> {
   const tam = hatchet.task({ name: JOB_NAMES.tam, fn: async () => { throw new Error("runs on the gtm worker"); } });
 
   console.log(`• running tam for ${input.segments.length} segment(s) via ${input.source} (budget $${input.budget_usd})`);
-  const hint = setTimeout(() => console.log("  … still waiting. Is the worker running? (`pnpm worker` in gtm-core)"), 20_000);
+  const hint = setTimeout(() => console.log("  … still waiting. Is the worker running? (`npx gtm stack status`)"), 20_000);
   try {
     const output = await tam.run(input as never);
     printTam(TamJobResult.parse(output), campaign);

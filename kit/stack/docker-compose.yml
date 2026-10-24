@@ -1,0 +1,66 @@
+# One project's stack: Postgres (this project's data + Hatchet's state), hatchet-lite (job engine) and
+# the gtm worker at the core version this project repo pins. Driven by `npx gtm stack up|down|status`,
+# which sets the compose project name (gtm-<project_id>), the ports and the worker image.
+# Data stays in this project's Docker volumes; nothing here is written into the repo.
+services:
+  postgres:
+    image: postgres:16.10
+    command: postgres -c max_connections=200
+    environment:
+      POSTGRES_USER: gtm
+      POSTGRES_PASSWORD: gtm
+      POSTGRES_DB: gtm
+    # Local only: reachable from this machine (QA samples in a DB console), not from the network.
+    ports: ["127.0.0.1:${GTM_PG_PORT:-5432}:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gtm -d gtm"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  hatchet-lite:
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:v0.110.5
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${GTM_HATCHET_UI_PORT:-8888}:8888"
+      - "127.0.0.1:${GTM_HATCHET_GRPC_PORT:-7077}:7077"
+    environment:
+      DATABASE_URL: postgresql://gtm:gtm@postgres:5432/hatchet?sslmode=disable
+      SERVER_AUTH_COOKIE_DOMAIN: localhost
+      SERVER_AUTH_COOKIE_INSECURE: "t"
+      SERVER_GRPC_BIND_ADDRESS: 0.0.0.0
+      SERVER_GRPC_INSECURE: "t"
+      SERVER_GRPC_BROADCAST_ADDRESS: localhost:${GTM_HATCHET_GRPC_PORT:-7077}
+      SERVER_GRPC_PORT: "7077"
+      SERVER_URL: http://localhost:${GTM_HATCHET_UI_PORT:-8888}
+      SERVER_AUTH_SET_EMAIL_VERIFIED: "t"
+      SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: localhost:7077
+    volumes:
+      - hatchet_config:/config
+
+  worker:
+    image: ${GTM_WORKER_IMAGE:-ghcr.io/veleads/gtm-worker:latest}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      hatchet-lite:
+        condition: service_started
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://gtm:gtm@postgres:5432/gtm
+      HATCHET_CLIENT_TOKEN: ${HATCHET_CLIENT_TOKEN:-}
+      HATCHET_CLIENT_HOST_PORT: hatchet-lite:7077
+      HATCHET_CLIENT_TLS_STRATEGY: none
+    # Provider API keys: ~/.gtm/stacks/<project_id>.secrets.env, outside the repo. Optional.
+    env_file:
+      - path: ${GTM_SECRETS_FILE:-/dev/null}
+        required: false
+
+volumes:
+  pgdata:
+  hatchet_config:

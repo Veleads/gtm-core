@@ -138,11 +138,24 @@ export const COMMANDS: Record<string, CommandHelp> = {
       "tam: builds the TAM for the campaign's segments into the database (needs an approved ICP and",
       "config.yaml → tam.source; mock-accounts for a local proof) and prints the funnel, cost and run_id.",
       "Validates first, sends the resolved config to the workers via Hatchet, and waits for the result.",
-      "Local: `pnpm stack:up` + `pnpm worker` in gtm-core (settings in ~/.gtm/stack.env).",
+      "Needs this project's stack: `npx gtm stack up` (settings in ~/.gtm/stacks/<project_id>.env).",
       "Planned (exit 1, a stop per AGENTS.md): enrich, suppression:import, signals, qualify, qa, push, activate, results.",
     ],
     writes: "Rows in Postgres (runs, accounts, costs). No repo files: copy the printed run-log row into the run log.",
     examples: ["npx gtm job tam q1-uk-cfo"],
+  },
+  stack: {
+    usage: "gtm stack up\ngtm stack down [--wipe]\ngtm stack status",
+    summary: "run this project's own stack (Postgres + Hatchet + worker) on Docker",
+    details: [
+      "One stack per project (compose project gtm-<project_id>, its own volumes and database). The worker image",
+      "matches the core version this repo pins and applies database migrations when it starts. Needs Docker.",
+      "Ports: GTM_PG_PORT (5432), GTM_HATCHET_UI_PORT (8888), GTM_HATCHET_GRPC_PORT (7077); set them to run two stacks at once.",
+      "Provider API keys for the worker: ~/.gtm/stacks/<project_id>.secrets.env (never in the repo).",
+      "down keeps the data; down --wipe deletes this project's database and Hatchet state (ask the human first).",
+    ],
+    writes: "Docker containers and volumes, and ~/.gtm/stacks/<project_id>.env. No repo files.",
+    examples: ["npx gtm stack up", "npx gtm stack status", "GTM_PG_PORT=5433 npx gtm stack up"],
   },
 };
 

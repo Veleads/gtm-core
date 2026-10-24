@@ -4,6 +4,14 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+- **opt-in** `gtm stack up | down [--wipe] | status`: each project repo runs its own stack (Postgres +
+  hatchet-lite + gtm worker) on Docker, as compose project `gtm-<project_id>` with its own volumes. The
+  worker is the image `ghcr.io/veleads/gtm-worker:<version>` matching the pinned core; it applies
+  database migrations when it starts. Connection settings go to `~/.gtm/stacks/<project_id>.env`
+  (used by `gtm job`), provider keys to `~/.gtm/stacks/<project_id>.secrets.env`; nothing is written
+  into the repo. Ports are configurable (`GTM_PG_PORT`, `GTM_HATCHET_UI_PORT`, `GTM_HATCHET_GRPC_PORT`)
+  and bound to localhost only. Releases now also publish the worker image. The gtm-core development
+  stack (`pnpm stack:up` + `pnpm worker`) still works as a fallback for `gtm job`.
 - **action** One database per project: each project repo runs its own stack (Postgres + Hatchet +
   workers) and core holds no project state. Rows no longer carry `project_id`; unique keys are now
   per database (`accounts` on `tam_id` + `domain`, `contacts` on `linkedin_url`, …). A new

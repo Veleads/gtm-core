@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { chmodSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createHatchetToken, hatchetReady, waitFor } from "../packages/core/src/local-stack.ts";
 import { STACK_ENV_FILE } from "../packages/core/src/stack-env.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -17,44 +18,19 @@ function sh(cmd: string, args: string[], opts: { cwd?: string; env?: NodeJS.Proc
   if (res.status !== 0) throw new Error(`${cmd} ${args.join(" ")} failed${opts.quiet ? `: ${res.stderr || res.stdout}` : ""}`);
   return (res.stdout ?? "").trim();
 }
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-async function waitFor(what: string, check: () => Promise<boolean> | boolean, seconds = 120) {
-  for (let i = 0; i < seconds; i++) {
-    if (await check()) return;
-    await sleep(1000);
-  }
-  throw new Error(`timed out waiting for ${what}`);
-}
-
-async function hatchetReady() {
-  try { return (await fetch(`${HATCHET_URL}/api/ready`)).ok; } catch { return false; }
-}
 
 async function up() {
   console.log("• starting postgres + hatchet-lite");
   sh("docker", ["compose", "up", "-d", "--wait", "postgres"]);
   sh("docker", ["compose", "up", "-d", "hatchet-lite"]);
-  await waitFor("hatchet-lite", hatchetReady);
+  await waitFor("hatchet-lite", () => hatchetReady(HATCHET_URL));
 
   console.log("• applying gtm database migrations");
   sh("npx", ["prisma", "migrate", "deploy"], { cwd: join(ROOT, "db"), env: { DATABASE_URL } });
 
   console.log("• creating a Hatchet API token");
-  // The seeded "default" tenant. (Hatchet also creates an "internal" tenant whose queue is never
-  // scheduled for user workers: a token for it makes jobs wait forever.)
-  let tenant = "";
-  await waitFor("hatchet tenant", () => {
-    tenant = sh("docker", ["compose", "exec", "-T", "postgres", "psql", "-U", "gtm", "-d", "hatchet", "-tAc", `select id from "Tenant" where slug = 'default'`], { quiet: true });
-    return /^[0-9a-f-]{36}$/.test(tenant);
-  });
-  let token = "";
-  await waitFor("hatchet token", () => {
-    try {
-      token = sh("docker", ["compose", "exec", "-T", "hatchet-lite", "/hatchet-admin", "token", "create", "--config", "/config", "--tenant-id", tenant, "--name", `gtm-local-${Date.now()}`], { quiet: true }).split("\n").at(-1)!.trim();
-    } catch { token = ""; }
-    return /^eyJ[\w-]+\.[\w-]+\.[\w-]+$/.test(token);
-  }, 60);
+  const exec = (service: string, args: string[]) => sh("docker", ["compose", "exec", "-T", service, ...args], { quiet: true });
+  const token = await createHatchetToken(exec, `gtm-local-${Date.now()}`);
 
   mkdirSync(dirname(STACK_ENV_FILE), { recursive: true });
   writeFileSync(STACK_ENV_FILE, `# Written by \`pnpm stack:up\` in gtm-core. Local stack only; never commit.\nDATABASE_URL=${DATABASE_URL}\nHATCHET_CLIENT_TOKEN=${token}\nHATCHET_CLIENT_TLS_STRATEGY=none\n`);
@@ -75,7 +51,7 @@ function down(wipe: boolean) {
 
 async function status() {
   sh("docker", ["compose", "ps"]);
-  console.log(`hatchet: ${(await hatchetReady()) ? "ready" : "not ready"} · env file: ${existsSync(STACK_ENV_FILE) ? STACK_ENV_FILE : "missing"}`);
+  console.log(`hatchet: ${(await hatchetReady(HATCHET_URL)) ? "ready" : "not ready"} · env file: ${existsSync(STACK_ENV_FILE) ? STACK_ENV_FILE : "missing"}`);
 }
 
 const [cmd] = process.argv.slice(2);
