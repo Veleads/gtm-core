@@ -1,0 +1,15 @@
+{
+  "name": "@gtm/workers",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/main.ts"
+  },
+  "dependencies": {
+    "@gtm/core": "workspace:*",
+    "@gtm/db": "workspace:*",
+    "@gtm/schemas": "workspace:*",
+    "@hatchet-dev/typescript-sdk": "1.43.0"
+  }
+}

@@ -4,6 +4,9 @@ campaign_id: uk-mfg-hiring
 owner: jdoe
 stage: copy # current stage; see AGENTS.md routing table
 tam_id: example-tam-2026q4
+tam:
+  source: mock-accounts # fictional accounts for the local proof; swap for a real account source
+  max_accounts_per_segment: 500
 segments: [uk-manufacturing-mm]
 personas: [finance-leader, ap-owner]
 

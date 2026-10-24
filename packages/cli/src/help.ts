@@ -121,13 +121,16 @@ export const COMMANDS: Record<string, CommandHelp> = {
     examples: ["npx gtm upgrade", "npx gtm upgrade 0.3.0"],
   },
   job: {
-    usage: "gtm job <name> <campaign>",
-    summary: "run a pipeline job (Phase 2)",
+    usage: "gtm job tam <campaign>",
+    summary: "run a pipeline job on the workers",
     details: [
-      "Planned: tam, enrich, suppression:import, signals, qualify, qa, push, activate, results, status.",
-      "Not available yet: it exits 1. Per AGENTS.md this is a stop; do not improvise jobs with ad-hoc scripts.",
+      "tam: builds the TAM for the campaign's segments into the database (needs an approved ICP and",
+      "config.yaml → tam.source; mock-accounts for a local proof) and prints the funnel, cost and run_id.",
+      "Validates first, sends the resolved config to the workers via Hatchet, and waits for the result.",
+      "Local: `pnpm stack:up` + `pnpm worker` in gtm-core (settings in ~/.gtm/stack.env).",
+      "Planned (exit 1, a stop per AGENTS.md): enrich, suppression:import, signals, qualify, qa, push, activate, results.",
     ],
-    writes: "Nothing yet.",
+    writes: "Rows in Postgres (runs, accounts, costs). No repo files: copy the printed run-log row into the run log.",
     examples: ["npx gtm job tam q1-uk-cfo"],
   },
 };

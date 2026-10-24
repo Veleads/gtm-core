@@ -1,12 +1,29 @@
 # workers/
 
-Hatchet workflows that wrap `packages/core`. **Empty in Phase 1.**
+Hatchet workers that execute gtm jobs. They wrap `packages/core` (adapters, cost tracker) and write to
+Postgres through `@gtm/db`. **Available: `tam`.** Planned below.
 
-Planned (Phase 2+), one workflow per job in AGENTS.md section 7:
+## Run locally (local stack v0)
+```bash
+pnpm stack:up     # Postgres + hatchet-lite, gtm migrations, Hatchet token → ~/.gtm/stack.env
+pnpm worker       # this worker, on your machine (connects using ~/.gtm/stack.env)
+# in a project repo:
+npx gtm job tam <campaign>
+pnpm test:stack   # automated proof: two runs, idempotency, suppression, refusals
+```
+Hatchet UI: http://localhost:8888 (local login admin@example.com / Admin123!!).
+
+## How a job flows
+`gtm job` (in the project repo) validates, resolves config + context into the payload defined in
+`packages/schemas/src/jobs.ts`, and triggers the Hatchet task. The worker validates the payload
+again, records a `runs` row, does the work through adapters (cost-capped), and returns counts. Workers
+never read project repos.
+
+Jobs (one Hatchet task each):
 
 | Workflow | Wraps | Notes |
 |---|---|---|
-| `tam` | `AccountSourceAdapter` | paginate segments → upsert `accounts` |
+| `tam` ✅ | `AccountSourceAdapter` (`mock-accounts` for local proofs) | paginate segments → bulk upsert `accounts`, funnel counts |
 | `enrich` | `findPeople` + `runEmailWaterfall` | fan out per account, concurrency per provider rate limit, `CostTracker` cap |
 | `suppression-import` | n/a | file path outside git → `suppression` rows |
 | `signals` | `SignalsAdapter` | |

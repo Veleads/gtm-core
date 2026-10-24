@@ -5,6 +5,9 @@ campaign_id: __CAMPAIGN_ID__
 owner: __OWNER__
 stage: icp
 tam_id: __PROJECT_ID__-tam-TODO
+tam:
+  source: mock-accounts # mock-accounts proves the pipeline locally; replace with a real account source
+  max_accounts_per_segment: 500
 segments: [segment-one]
 personas: [persona-one]
 

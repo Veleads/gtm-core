@@ -54,7 +54,8 @@ corepack enable   # or: npx pnpm@10 <command>
 pnpm install
 pnpm check        # typecheck + tests + validate examples + public-repo guard
 pnpm test:e2e     # pack the CLI, scaffold a project repo, install, sync, validate
-docker compose up -d && pnpm db:migrate   # local Postgres + hatchet-lite
+pnpm stack:up && pnpm worker   # local Postgres + hatchet-lite + worker (see workers/README.md)
+pnpm test:stack                # proof: `gtm job tam` end to end against the local stack
 ```
 
 Contributor guide: [AGENTS.md](AGENTS.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
