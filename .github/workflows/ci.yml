@@ -25,3 +25,10 @@ jobs:
       - run: pnpm test:e2e
       - name: Worker image builds (not pushed)
         run: docker build -f workers/Dockerfile -t gtm-worker:ci .
+
+  # The release publishes the worker image for amd64 and arm64; prove the arm64 build on every PR.
+  worker-image-arm64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -f workers/Dockerfile -t gtm-worker:ci-arm64 .
