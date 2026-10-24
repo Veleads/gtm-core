@@ -1,6 +1,6 @@
 {
   "name": "@veleads/gtm",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "gtm-brain core: process kit (AGENTS.md, skills, templates, schemas) and the gtm CLI for client repos",
   "keywords": [
     "gtm",

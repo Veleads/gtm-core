@@ -78,7 +78,11 @@ unapproved gate.
 `tracker` (GitHub issues by default). It is a mirror only: the YAML files are the truth. If it fails
 (no network, no token), note it in the run log and carry on; never skip a gate because of it.
 
-ICP (stage 1) is **per project** (`context/`); stages 2–8 are **per campaign**. A new campaign starts at
+ICP (stage 1) is **per project** (`context/`); stages 2–8 are **per campaign**. **From stage 2 on,
+gtm-brain assumes an approved ICP.** Stage 1 ends with a decision, not certainty: when unsure,
+approve the best one to three segments and let results decide; revising the ICP later is normal
+(change it, re-approve, continue). The ICP is layered: `core` (every segment), `segments` (only what
+differs), personas, signals, exclusions; `npx gtm icp` shows each segment's final filters. A new campaign starts at
 `tam` if the approved ICP already covers its segments; otherwise it goes back to `icp`.
 
 ## 4. Hard stops (human approval points)
@@ -165,6 +169,7 @@ Run from the repo root. If you cannot run shell commands, give the exact command
 | `npx gtm status` | campaigns, stages, gate states, latest run logs | available |
 | `npx gtm validate [campaign] [--verify-github]` | schemas, gates, cross-references, data rules, core sync; `--verify-github` re-checks PR approvals on GitHub | available |
 | `npx gtm new-campaign <slug>` | scaffold `campaigns/<slug>/` | available |
+| `npx gtm icp` | show the ICP as jobs see it: core, each segment's final filters and personas | available |
 | `npx gtm approve icp --pr <n>` / `--by "<name>"` | record ICP sign-off (GitHub review, or explicit approval by name) and pin its hash | available |
 | `npx gtm approve copy <campaign> --pr <n>` / `--by "<name>"` | record copy sign-off the same way | available |
 | `npx gtm track stage <campaign>` | mirror the campaign's stage into the tracker | available |

@@ -1,21 +1,30 @@
 # yaml-language-server: $schema=../.gtm/schemas/icp.schema.json
+# Layers: core (every segment) → segments (only what differs) → personas → exclusions. Signals live in
+# signals.yaml. A segment field REPLACES the same core field. Review the result with `npx gtm icp`.
 version: 2
 project_id: __PROJECT_ID__
 approval:
   status: pending # only a named human approves (AGENTS.md hard stop)
   approved_by: null
   approved_at: null
+core:
+  firmographics:
+    industries: [TODO] # what every good-fit company shares
+    employee_count: {min: 20, max: 500}
 segments:
   - id: segment-one
-    description: TODO
+    description: TODO # who, in a few words
     firmographics:
-      industries: []
-      employee_count: {min: 50, max: 1000}
-      hq_countries: []
+      hq_countries: [] # only what differs from core, e.g. [GB]
+  # - id: segment-two
+  #   description: ...
+  #   firmographics: {hq_countries: [DE, AT, CH], employee_count: {min: 50, max: 1000}}
+  #   personas: [persona-one]   # optional: restrict personas for this segment
 personas:
   - id: persona-one
     role: decision_maker
     titles_any: [TODO]
+    titles_none: [Assistant, Intern]
     seniorities: []
     departments: []
 exclusions:

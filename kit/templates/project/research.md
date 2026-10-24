@@ -21,7 +21,14 @@
 | Company | Domain | Industry / size | Source |
 |---|---|---|---|
 
-What the strongest customers have in common (ICP hint):
+### ICP hints
+**Core candidates** (traits most customers share):
+| Trait | How many customers share it | Source |
+|---|---|---|
+
+**Segment candidates** (clusters that differ in filters and treatment):
+| Cluster | Differs by | Members | Why it may need its own angle |
+|---|---|---|---|
 
 ## Competitors (exclusion candidates)
 | Competitor | Domain | Positioning | Pricing | How we differ | Source |

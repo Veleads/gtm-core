@@ -5,18 +5,21 @@ approval:
   approved_by: "Maria Chen (VP Marketing)"
   approved_at: 2026-09-12
   notes: "Approved on kickoff call; asked to start with UK manufacturing."
-  content_hash: sha256:70706e62f441f315
+  content_hash: sha256:519b755c76f81410
+# Core: true for every segment. Segments only add or replace what differs (`npx gtm icp` shows the result).
+core:
+  firmographics:
+    employee_count: {min: 200, max: 1500}
+    keywords_none: [holding company]
 segments:
   - id: uk-manufacturing-mm
-    description: UK manufacturers, 200-1500 employees
+    description: UK manufacturers on mid-market ERPs
     firmographics:
       industries: [Manufacturing, Industrial Machinery, Food & Beverage Manufacturing]
-      employee_count: {min: 200, max: 1500}
       hq_countries: [GB]
       technologies_any: [Sage 200, Microsoft Dynamics NAV, SAP Business One]
-      keywords_none: [holding company]
   - id: dach-wholesale-mm
-    description: DACH wholesale and distribution, 200-1000 employees
+    description: DACH wholesale and distribution (smaller size band)
     firmographics:
       industries: [Wholesale, Distribution, Logistics]
       employee_count: {min: 200, max: 1000}
