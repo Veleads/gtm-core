@@ -4,6 +4,8 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 **migration** (handled by `gtm migrate`). See AGENTS.md section 3.
 
 ## [Unreleased]
+
+## [0.5.0] - 2026-10-24
 - **action** Research-first intake: new `research` skill writes `context/research.md` (sourced facts,
   public customers as suppression candidates, competitors as exclusion candidates, triggers) before any
   questions; `00-intake` drafts intake from it and asks only what research can't answer, with an
