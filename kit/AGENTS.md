@@ -182,8 +182,9 @@ Every job prints a `run_id`, counts and cost. Copy those into the run log.
 
 ## 9. Onboarding
 
-- **New project:** a GTM engineer runs `npx @veleads/gtm init <slug> --name "<Name>"`, pushes it as a
-  **private** repo (e.g. `<org>/gtm-project-<slug>`), then stage `00-intake` begins.
+- **New project:** create an empty **private** repo (e.g. `<org>/gtm-project-<slug>`), clone it, and in
+  that folder run `npx @veleads/gtm init . --name "<Name>"` (or `init <slug>` to create a new folder).
+  Commit, push, then stage `00-intake` begins.
 - **New campaign:** from up-to-date `main`: `git switch -c campaign/<slug>`,
   `npx gtm new-campaign <slug>`, fill `brief.md`, set `stage`, follow the routing table.
 - **New SDR:** read this file and `PROJECT.md`, run `npx gtm status`, then section 2 with a GTM engineer watching.

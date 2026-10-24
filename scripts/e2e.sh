@@ -76,6 +76,18 @@ test -f node_modules/@veleads/gtm/README.md || { echo "README missing from packa
 echo "• status"
 npx gtm status
 
+echo "• 'init .' sets up a freshly cloned repo in place without overwriting anything"
+mkdir -p "$WORK/gtm-project-delta" && cd "$WORK/gtm-project-delta"
+git init -q -b main && printf '# delta\n' > README.md && printf 'node_modules/\n' > .gitignore && git add -A && git -c user.email=e2e@example.com -c user.name=e2e commit -qm init
+node "$ROOT/packages/cli/dist/cli.js" init . --name "Delta" >/dev/null
+grep -q "^project_id: delta" project.yaml || { echo "expected slug from folder name"; exit 1; }
+[ "$(head -1 README.md)" = "# delta" ] || { echo "README.md was overwritten"; exit 1; }
+grep -q '^\*.csv' .gitignore || { echo "gtm rules not appended to .gitignore"; exit 1; }
+[ "$(git rev-list --count HEAD)" = "1" ] || { echo "git history changed"; exit 1; }
+mkdir -p "$WORK/clash" && cd "$WORK/clash" && echo keep > AGENTS.md
+if node "$ROOT/packages/cli/dist/cli.js" init . --name "Clash" >/dev/null 2>&1; then echo "expected init to refuse an existing AGENTS.md"; exit 1; fi
+[ "$(ls -A)" = "AGENTS.md" ] || { echo "a refused init must not write anything"; exit 1; }
+
 echo "• pnpm-installed project repos work the same (lockfile-detected, no pin needed)"
 node "$ROOT/packages/cli/dist/cli.js" init pnpmcheck --name "Pnpm Check" --dir "$WORK/pnpm-project" >/dev/null
 cd "$WORK/pnpm-project"

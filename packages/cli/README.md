@@ -12,14 +12,15 @@ Source: [Veleads/gtm-core](https://github.com/Veleads/gtm-core) · MIT
 Requires Node.js 22+. npm is enough; pnpm or yarn work too (the repo follows whichever lockfile you commit).
 
 ```bash
-npx @veleads/gtm init acme --name "Acme Corp"
-cd gtm-project-acme
+# in an empty or freshly cloned (private) repo folder:
+npx @veleads/gtm init . --name "Acme Corp"
 npm install
 npx gtm status
 npx gtm validate
 ```
 
-Push the new folder to a **private** repository, then open it in your coding agent. The generated
+`init .` keeps an existing `.git`, README and `.gitignore` (gtm rules are appended) and never overwrites
+files; `init acme --name "Acme Corp"` creates `./gtm-project-acme` instead. Push to a **private** repository, then open it in your coding agent. The generated
 `AGENTS.md` tells the agent how to work in the repo, starting at stage `00-intake`.
 
 ## What you get in a project repo
@@ -43,7 +44,7 @@ command writes**, and examples, without running it.
 
 | Command | What it does | Writes |
 |---|---|---|
-| `init <slug> --name "<Name>"` | scaffold a new project repo | new folder |
+| `init . --name "<Name>"` / `init <slug> --name "<Name>"` | set up the current folder / a new one | target folder, never overwrites |
 | `new-campaign <slug>` | scaffold `campaigns/<slug>/` | that folder |
 | `validate [campaign]` | schemas, gates, cross-references, no lead data, core sync | nothing |
 | `status` | campaigns, stages, gates | nothing |
