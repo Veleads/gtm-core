@@ -1,0 +1,306 @@
+// Data layer (AGENTS.md "Data rules"):
+// - every row carries project_id, campaign_id (null when not campaign-scoped), run_id, timestamps
+// - PII lives here and nowhere else; git only ever gets aggregates
+// Table and column names are snake_case in Postgres (@@map / @map); models are PascalCase in code.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Stage {
+  intake
+  icp
+  tam
+  enrich
+  qualify
+  copy
+  qa
+  launch
+  results
+
+  @@map("stage")
+}
+
+enum RunStatus {
+  queued
+  running
+  succeeded
+  failed
+  cancelled
+  budget_stopped
+
+  @@map("run_status")
+}
+
+enum EmailStatus {
+  valid
+  catch_all
+  invalid
+  unknown
+  not_found
+
+  @@map("email_status")
+}
+
+enum Tier {
+  A
+  B
+  C
+
+  @@map("tier")
+}
+
+enum SuppressionKind {
+  customers
+  open_deals
+  competitors
+  do_not_contact
+  past_bounces
+  unsubscribed
+  recently_contacted
+
+  @@map("suppression_kind")
+}
+
+enum LeadStatus {
+  qualified
+  suppressed
+  disqualified
+  ready
+  pushed
+  sent
+  replied
+  positive
+  meeting
+  bounced
+  unsubscribed
+
+  @@map("lead_status")
+}
+
+enum OutreachEventKind {
+  sent
+  opened
+  replied
+  positive
+  meeting
+  bounced
+  unsubscribed
+
+  @@map("outreach_event")
+}
+
+/// One row per job execution. run_id is referenced by every other table and by run logs in git.
+model Run {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId   String    @map("project_id")
+  campaignId  String?   @map("campaign_id")
+  stage       Stage
+  job         String
+  status      RunStatus @default(queued)
+  triggeredBy String    @map("triggered_by")
+  gitSha      String?   @map("git_sha")
+  configHash  String?   @map("config_hash")
+  params      Json      @default("{}")
+  counts      Json      @default("{}")
+  error       String?
+  startedAt   DateTime? @map("started_at") @db.Timestamptz(6)
+  finishedAt  DateTime? @map("finished_at") @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([projectId, campaignId], map: "runs_project_campaign_idx")
+  @@map("runs")
+}
+
+model Account {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId     String   @map("project_id")
+  campaignId    String?  @map("campaign_id")
+  runId         String   @map("run_id") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  tamId         String   @map("tam_id")
+  segmentId     String?  @map("segment_id")
+  domain        String
+  name          String
+  linkedinUrl   String?  @map("linkedin_url")
+  industry      String?
+  employeeCount Int?     @map("employee_count")
+  revenueUsd    BigInt?  @map("revenue_usd")
+  hqCountry     String?  @map("hq_country")
+  technologies  String[] @default([])
+  reachable     Boolean?
+  fieldSources  Json     @default("{}") @map("field_sources")
+
+  contacts      Contact[]
+  signals       Signal[]
+  campaignLeads CampaignLead[]
+
+  @@unique([projectId, tamId, domain], map: "accounts_project_tam_domain_uq")
+  @@map("accounts")
+}
+
+model Contact {
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId    String      @map("project_id")
+  campaignId   String?     @map("campaign_id")
+  runId        String      @map("run_id") @db.Uuid
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  accountId    String      @map("account_id") @db.Uuid
+  firstName    String      @map("first_name")
+  lastName     String      @map("last_name")
+  title        String
+  seniority    String?
+  department   String?
+  linkedinUrl  String?     @map("linkedin_url")
+  country      String?
+  email        String?
+  emailStatus  EmailStatus @default(unknown) @map("email_status")
+  emailSource  String?     @map("email_source")
+  verifiedAt   DateTime?   @map("verified_at") @db.Timestamptz(6)
+  fieldSources Json        @default("{}") @map("field_sources")
+
+  account       Account        @relation(fields: [accountId], references: [id])
+  signals       Signal[]
+  campaignLeads CampaignLead[]
+
+  @@unique([projectId, linkedinUrl], map: "contacts_project_linkedin_uq")
+  @@index([projectId, email], map: "contacts_project_email_idx")
+  @@map("contacts")
+}
+
+/// Raw provider responses cached by input key. Re-running a job never re-pays for the same input.
+model Enrichment {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId  String   @map("project_id")
+  campaignId String?  @map("campaign_id")
+  runId      String   @map("run_id") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  provider   String
+  operation  String
+  inputKey   String   @map("input_key")
+  input      Json
+  response   Json?
+  ok         Boolean
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz(6)
+
+  @@unique([projectId, provider, operation, inputKey], map: "enrichments_cache_uq")
+  @@map("enrichments")
+}
+
+model Signal {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId   String   @map("project_id")
+  campaignId  String?  @map("campaign_id")
+  runId       String   @map("run_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  signalKey   String   @map("signal_key")
+  accountId   String   @map("account_id") @db.Uuid
+  contactId   String?  @map("contact_id") @db.Uuid
+  observedAt  DateTime @map("observed_at") @db.Timestamptz(6)
+  source      String
+  evidenceUrl String?  @map("evidence_url")
+  summary     String
+
+  account Account  @relation(fields: [accountId], references: [id])
+  contact Contact? @relation(fields: [contactId], references: [id])
+
+  @@index([projectId, accountId, signalKey], map: "signals_project_account_idx")
+  @@map("signals")
+}
+
+/// campaign_id null = applies to every campaign of the project. Match on domain and/or email.
+model Suppression {
+  id         String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId  String          @map("project_id")
+  campaignId String?         @map("campaign_id")
+  runId      String          @map("run_id") @db.Uuid
+  createdAt  DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  kind       SuppressionKind
+  domain     String?
+  email      String?
+  reason     String?
+  source     String
+  expiresAt  DateTime?       @map("expires_at") @db.Timestamptz(6)
+
+  @@index([projectId, domain], map: "suppression_project_domain_idx")
+  @@index([projectId, email], map: "suppression_project_email_idx")
+  @@map("suppression")
+}
+
+model CampaignLead {
+  id                   String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId            String           @map("project_id")
+  campaignId           String           @map("campaign_id")
+  runId                String           @map("run_id") @db.Uuid
+  createdAt            DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  contactId            String           @map("contact_id") @db.Uuid
+  accountId            String           @map("account_id") @db.Uuid
+  segmentId            String           @map("segment_id")
+  personaId            String           @map("persona_id")
+  score                Int
+  tier                 Tier
+  signalKeys           String[]         @default([]) @map("signal_keys")
+  variables            Json             @default("{}")
+  status               LeadStatus       @default(qualified)
+  suppressionReason    SuppressionKind? @map("suppression_reason")
+  suppressionCheckedAt DateTime?        @map("suppression_checked_at") @db.Timestamptz(6)
+  senderLeadRef        String?          @map("sender_lead_ref")
+  pushedAt             DateTime?        @map("pushed_at") @db.Timestamptz(6)
+
+  contact        Contact         @relation(fields: [contactId], references: [id])
+  account        Account         @relation(fields: [accountId], references: [id])
+  outreachEvents OutreachEvent[]
+
+  @@unique([projectId, campaignId, contactId], map: "campaign_leads_campaign_contact_uq")
+  @@index([projectId, campaignId, status], map: "campaign_leads_status_idx")
+  @@map("campaign_leads")
+}
+
+model OutreachEvent {
+  id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId      String            @map("project_id")
+  campaignId     String            @map("campaign_id")
+  runId          String            @map("run_id") @db.Uuid
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  campaignLeadId String            @map("campaign_lead_id") @db.Uuid
+  kind           OutreachEventKind
+  step           Int?
+  variant        String?
+  occurredAt     DateTime          @map("occurred_at") @db.Timestamptz(6)
+  externalRef    String            @map("external_ref")
+
+  campaignLead CampaignLead @relation(fields: [campaignLeadId], references: [id])
+
+  @@unique([projectId, externalRef, kind], map: "outreach_events_external_uq")
+  @@map("outreach_events")
+}
+
+model Cost {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId   String   @map("project_id")
+  campaignId  String?  @map("campaign_id")
+  runId       String   @map("run_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  provider    String
+  operation   String
+  units       Int
+  unitCostUsd Decimal  @map("unit_cost_usd") @db.Decimal(12, 6)
+  totalUsd    Decimal  @map("total_usd") @db.Decimal(12, 6)
+  cached      Boolean  @default(false)
+
+  @@index([projectId, campaignId], map: "costs_project_campaign_idx")
+  @@map("costs")
+}

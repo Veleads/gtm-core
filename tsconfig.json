@@ -25,6 +25,6 @@
     "packages/*/scripts",
     "packages/*/tsup.config.ts",
     "db/src",
-    "db/drizzle.config.ts"
+    "db/prisma.config.ts"
   ]
 }

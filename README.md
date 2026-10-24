@@ -55,7 +55,8 @@ docker compose up -d && pnpm db:migrate   # local Postgres + hatchet-lite
 ```
 
 Contributor guide: [AGENTS.md](AGENTS.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
-DB layer uses **Drizzle** (plain TypeScript schema, readable SQL migrations).
+DB layer uses **Prisma 7** (`db/prisma/schema.prisma`, SQL migrations in `db/prisma/migrations/`, client via
+the `pg` driver adapter). Bulk idempotent writes use `$executeRaw` with `INSERT … ON CONFLICT`.
 
 ## License
 

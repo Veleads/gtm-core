@@ -3,3 +3,10 @@ packages:
   - db
 onlyBuiltDependencies:
   - esbuild
+  - prisma
+  - "@prisma/engines"
+
+# Security overrides (Dependabot). Remove when upstream ships fixed versions.
+overrides:
+  # GHSA-g7r4-m6w7-qqqr (esbuild < 0.28.1, via tsup)
+  esbuild: ">=0.28.1"
