@@ -35,8 +35,9 @@ Read the operator manual agents follow in project repos: [kit/AGENTS.md](kit/AGE
 ## Start a project repo
 
 ```bash
-npx @veleads/gtm init acme --name "Acme Corp"
-cd gtm-project-acme && npm install     # or pnpm / yarn: any package manager works
+# in an empty or freshly cloned private repo folder:
+npx @veleads/gtm init . --name "Acme Corp"
+npm install     # or pnpm / yarn: any package manager works
 npx gtm status
 npx gtm validate
 ```

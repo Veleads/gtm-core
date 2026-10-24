@@ -19,6 +19,7 @@ const { values, positionals } = parseArgs({
     root: { type: "string" },
     name: { type: "string" },
     dir: { type: "string" },
+    slug: { type: "string" },
     by: { type: "string" },
     notes: { type: "string" },
     date: { type: "string" },
@@ -47,7 +48,7 @@ function run(): boolean {
   // `gtm <command> --help` and `gtm help <command>` print help and never run the command.
   if (values.help) return help(command === "help" ? args[0] : command);
   switch (command) {
-    case "init": return runInit(args[0], { name: values.name, dir: values.dir, cwd });
+    case "init": return runInit(args[0], { name: values.name, dir: values.dir, slug: values.slug, cwd });
     case "new-campaign": return runNewCampaign(root, args[0]);
     case "validate": return runValidate(root, args[0]);
     case "status": return runStatus(root);

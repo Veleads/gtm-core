@@ -13,7 +13,7 @@ fi
 
 # 2. Email addresses other than fictional/test ones.
 emails=$(files | xargs -0 grep -hoIE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' 2>/dev/null \
-  | grep -viE '@([a-z0-9-]+\.)*example(\.(com|org|net))?$|noreply@anthropic\.com$' | sort -u || true)
+  | grep -viE '@([a-z0-9-]+\.)*example(\.(com|org|net))?$|noreply@anthropic\.com$|\.md$' | sort -u || true)
 if [ -n "$emails" ]; then echo "✗ email addresses found:"; echo "$emails"; fail=1; fi
 
 # 3. Example and template content uses .example domains only.

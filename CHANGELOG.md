@@ -5,6 +5,13 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-24
+- **no action** `gtm init . --name "<Name>"` sets up the current folder instead of creating a
+  subfolder (slug from the folder name, e.g. `gtm-project-acme` → `acme`, or `--slug`). Built for a
+  freshly cloned repo: `.git` is kept (no `git init` inside an existing repository), `README.md` is
+  kept, `.gitignore` gets gtm rules appended, `CLAUDE.md` gets `@AGENTS.md`. Any other existing gtm
+  file stops init before anything is written; init never overwrites files.
+
 ## [0.3.0] - 2026-10-24
 - **migration** "Clients" are now **projects**: one private repo = one project.
   `client.yaml` → `project.yaml`, `CLIENT.md` → `PROJECT.md`, `client_id` → `project_id` in every YAML

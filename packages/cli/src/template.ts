@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { walk } from "./fsutil.ts";
 
@@ -10,18 +10,30 @@ function destName(rel: string): string {
   return [DOTFILES.has(first!) ? `.${first}` : first, ...rest].join("/");
 }
 
-/** Copies a template tree, restoring dotfile names and replacing __PLACEHOLDERS__ in text files. */
-export function copyTemplate(src: string, dest: string, vars: Record<string, string>, opts: { only?: string[]; rename?: (rel: string) => string } = {}) {
-  for (const rel of walk(src)) {
-    if (opts.only && !opts.only.includes(rel)) continue;
-    const out = join(dest, (opts.rename ?? destName)(rel));
-    mkdirSync(dirname(out), { recursive: true });
-    if (/\.(md|ya?ml|json|txt|example)$|gitignore$/.test(rel)) {
-      let text = readFileSync(join(src, rel), "utf8");
-      for (const [k, v] of Object.entries(vars)) text = text.replaceAll(`__${k}__`, v);
-      writeFileSync(out, text);
-    } else {
-      cpSync(join(src, rel), out);
-    }
-  }
+export interface PlannedFile {
+  /** Destination path relative to the target folder. */
+  rel: string;
+  content: string | Buffer;
+}
+
+/** Renders a template tree in memory: dotfile names restored, __PLACEHOLDERS__ replaced in text files. */
+export function planTemplate(src: string, vars: Record<string, string>, rename: (rel: string) => string = destName): PlannedFile[] {
+  return walk(src).map((rel) => {
+    const raw = readFileSync(join(src, rel));
+    if (!/\.(md|ya?ml|json|txt|example)$|gitignore$/.test(rel)) return { rel: rename(rel), content: raw };
+    let text = raw.toString("utf8");
+    for (const [k, v] of Object.entries(vars)) text = text.replaceAll(`__${k}__`, v);
+    return { rel: rename(rel), content: text };
+  });
+}
+
+export function writePlanned(root: string, file: PlannedFile): void {
+  const out = join(root, file.rel);
+  mkdirSync(dirname(out), { recursive: true });
+  writeFileSync(out, file.content);
+}
+
+/** Renders and writes a template tree into `dest`. */
+export function copyTemplate(src: string, dest: string, vars: Record<string, string>, opts: { rename?: (rel: string) => string } = {}) {
+  for (const file of planTemplate(src, vars, opts.rename)) writePlanned(dest, file);
 }

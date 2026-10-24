@@ -13,7 +13,8 @@ Collect everything later stages need, once, in files, so no one has to re-ask th
 - `context/intake.md` (scaffolded from the core template by `gtm init`).
 
 ## Steps
-1. If the project repo does not exist yet, a GTM engineer creates it: `npx @veleads/gtm init <slug> --name "<Name>"`, then pushes it as a **private** repo (e.g. `<org>/gtm-project-<slug>`).
+1. If the project repo does not exist yet, a GTM engineer creates it: an empty **private** repo, cloned,
+   then `npx @veleads/gtm init . --name "<Name>"` inside it (keeps `.git` and README).
 2. Fill `project.yaml`: owners (GTM engineer, SDRs, **project approver**), regions, status `onboarding`.
 3. Walk the questionnaire in `context/intake.md` with the human. For each answer, write what the
    stakeholders said, not your interpretation. Unknown → write `unknown` and add it to open questions.

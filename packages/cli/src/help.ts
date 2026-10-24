@@ -12,15 +12,19 @@ export interface CommandHelp {
 
 export const COMMANDS: Record<string, CommandHelp> = {
   init: {
-    usage: 'gtm init <project-slug> --name "<Project Name>" [--dir <path>]',
-    summary: "scaffold a new project repo",
+    usage: 'gtm init <project-slug> --name "<Project Name>" [--dir <path>]\ngtm init . --name "<Project Name>" [--slug <project-slug>]',
+    summary: "scaffold a project repo (new folder, or the current one with \".\")",
     details: [
       "Creates a complete project repo: project.yaml, context/ templates, campaigns/, tam/, PROJECT.md,",
-      "CI workflows, .gtm/ (core kit) and AGENTS.md, pinned to this CLI's version, then runs git init.",
+      "CI workflows, .gtm/ (core kit) and AGENTS.md, pinned to this CLI's version.",
+      '"." sets up the current folder; the slug comes from the folder name (gtm-project-acme → acme) or --slug.',
+      "Works in a fresh clone: .git is kept (no git init inside an existing repo), README.md is kept,",
+      ".gitignore gets gtm rules appended, CLAUDE.md gets @AGENTS.md. Any other existing gtm file",
+      "(e.g. AGENTS.md, .gtm/, package.json) stops init before anything is written.",
       "Push the result to a PRIVATE repo: it will hold project context.",
     ],
-    writes: "A new folder (default ./gtm-project-<slug>). Refuses if it exists and is not empty.",
-    examples: ['npx @veleads/gtm init acme --name "Acme Corp"', 'npx @veleads/gtm init acme --name "Acme Corp" --dir ./projects/acme'],
+    writes: "The target folder (new ./gtm-project-<slug>, --dir, or the current folder with \".\"). Never overwrites existing files.",
+    examples: ['npx @veleads/gtm init . --name "Acme Corp"', 'npx @veleads/gtm init acme --name "Acme Corp"', 'npx @veleads/gtm init . --name "Acme Corp" --slug acme'],
   },
   "new-campaign": {
     usage: "gtm new-campaign <campaign-slug>",
