@@ -5,6 +5,10 @@ All notable changes to `@veleads/gtm`. Each entry is tagged: **no action**, **op
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-10-24
+- **no action** The worker image `ghcr.io/veleads/gtm-worker` is built for `linux/arm64` as well as
+  `linux/amd64`, so `gtm stack up` works on Apple Silicon and other ARM machines without emulation.
+
 ## [0.7.0] - 2026-10-24
 - **opt-in** `gtm stack up | down [--wipe] | status`: each project repo runs its own stack (Postgres +
   hatchet-lite + gtm worker) on Docker, as compose project `gtm-<project_id>` with its own volumes. The
