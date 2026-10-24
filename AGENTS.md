@@ -14,10 +14,11 @@ for people and agents changing the core.**
 | `kit/templates/` | yes → `.gtm/templates/` (+ used by `gtm init` / `new-campaign`) | `repo/`, `project/`, `campaign/`, `outputs/` |
 | `kit/providers/` | yes → `.gtm/providers/` | one doc per vendor |
 | `kit/schemas/` | yes → `.gtm/schemas/` | JSON Schema, generated from `packages/schemas` |
+| `kit/stack/` | in the package only (used by `gtm stack`) | compose file for one project's stack |
 | `packages/cli` | yes, as the `gtm` binary in `@veleads/gtm` | init, sync, validate, migrate, upgrade, status, job |
 | `packages/schemas` | bundled into the CLI | Zod schemas, file versions, features, migrations |
 | `packages/core` | no (used by workers) | adapter interfaces, waterfall, cost tracker |
-| `workers/`, `db/` | no (each project runs its own stack: Postgres + Hatchet + workers) | Hatchet workflows; Postgres via Prisma (`db/prisma/schema.prisma`) |
+| `workers/`, `db/` | as the image `ghcr.io/veleads/gtm-worker:<version>` (each project runs its own stack) | Hatchet workflows; Postgres via Prisma (`db/prisma/schema.prisma`) |
 | `examples/northwind/` | no | fictional project repo used as a test fixture |
 
 Project repos receive core only through releases.
@@ -63,6 +64,8 @@ project state** (one repo = one project = one database). So:
 - Release: move Unreleased to `## [x.y.z] - YYYY-MM-DD`, bump the version, merge, tag `vx.y.z`.
   `.github/workflows/release.yml` checks, builds and publishes to npmjs.com via **Trusted Publishing** (OIDC, no stored
   token; provenance is automatic) after approval in the `npm` environment. Token publishing is disabled on npm.
+  It then pushes the worker image `ghcr.io/veleads/gtm-worker:x.y.z`, which `gtm stack up` in a project on
+  that core version pulls (the GHCR package must stay public).
 - Project repos pick it up via their weekly `gtm-upgrade` workflow (opens a PR) or `npx gtm upgrade`.
 
 ## 4. Working in this repo
@@ -76,6 +79,7 @@ pnpm test:e2e         # pack the CLI, init a throwaway project repo, install, sy
 pnpm stack:up         # local Postgres + hatchet-lite + migrations + token (~/.gtm/stack.env)
 pnpm worker           # run the workers locally
 pnpm test:stack       # gtm job tam end to end against the local stack (needs Docker)
+docker build -f workers/Dockerfile -t gtm-worker:dev .   # worker image; GTM_WORKER_IMAGE=gtm-worker:dev npx gtm stack up
 ```
 
 - Branches `feat/…`, `fix/…`, `playbook/…`; PR to `main`; CODEOWNERS review. External PRs welcome (CONTRIBUTING.md).

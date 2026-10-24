@@ -1,0 +1,12 @@
+**/node_modules
+**/dist
+db/src/generated
+.git
+.github
+examples
+kit
+packages/cli
+scripts
+*.log
+.env
+.env.*

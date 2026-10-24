@@ -23,3 +23,5 @@ jobs:
       - name: kit/schemas is up to date with packages/schemas
         run: pnpm schemas:check
       - run: pnpm test:e2e
+      - name: Worker image builds (not pushed)
+        run: docker build -f workers/Dockerfile -t gtm-worker:ci .

@@ -2,6 +2,8 @@ name: release
 # Publishes @veleads/gtm to npm with Trusted Publishing (OIDC): no npm token is stored anywhere.
 # npmjs.com → @veleads/gtm → Settings → Trusted Publisher: GitHub Actions, org "Veleads",
 # repo "gtm-core", workflow "release.yml", environment "npm".
+# Then publishes the matching worker image ghcr.io/veleads/gtm-worker:<version> (GITHUB_TOKEN), which
+# each project's stack (`npx gtm stack up`) runs. The GHCR package must be public so any machine can pull it.
 on:
   push:
     tags: ["v*"]
@@ -43,3 +45,28 @@ jobs:
         run: cd packages/cli && pnpm pack --pack-destination "$RUNNER_TEMP"
       - name: Publish (OIDC, provenance generated automatically)
         run: npm publish "$RUNNER_TEMP"/veleads-gtm-*.tgz --access public
+
+  worker-image:
+    # Only after the npm publish was approved and succeeded: the image tag always has a matching CLI.
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Version from tag (v1.2.3 → 1.2.3, the tag `gtm stack up` pulls)
+        id: v
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: workers/Dockerfile
+          push: true
+          tags: ghcr.io/veleads/gtm-worker:${{ steps.v.outputs.version }}

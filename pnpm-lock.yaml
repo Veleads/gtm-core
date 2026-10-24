@@ -85,6 +85,9 @@ importers:
       '@hatchet-dev/typescript-sdk':
         specifier: 1.43.0
         version: 1.43.0(@grpc/grpc-js@1.14.6)(zod@4.6.7)
+      tsx:
+        specifier: ^4.20.0
+        version: 4.23.15
 
 packages:
 
